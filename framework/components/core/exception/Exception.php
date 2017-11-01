@@ -17,4 +17,4 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once __DIR__ . 'UnknownMethodException.php';
+require_once __DIR__ . '/UnknownMethodException.php';
