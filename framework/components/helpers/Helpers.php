@@ -22,4 +22,3 @@ require_once __DIR__ . '/UrlUtils.php';
 require_once __DIR__ . '/DateUtils.php';
 require_once __DIR__ . '/StringUtils.php';
 require_once __DIR__ . '/HtmlUtils.php';
-require_once __DIR__ . '/DataChecker.php';

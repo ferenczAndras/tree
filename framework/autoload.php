@@ -26,7 +26,6 @@ define("TREEURLGITHUB", "https://github.com/ferenczAndras/tree");
 
 define("FRAMEWORK_URL", "framework");
 
-require_once TREEPATH . '/helpers/autoload.php';
 
 require_once TREEPATH . '/components/autoload.php';
 
