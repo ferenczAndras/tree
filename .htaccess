@@ -1,0 +1,20 @@
+#AddType application/x-httpd-php54 .php
+Options +FollowSymLinks
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^([A-Za-z0-9\_\-]+)$ index.php?page=$1 [QSA,L]
+RewriteRule ^([A-Za-z0-9\_\-]+)/$ index.php?page=$1 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)$ index.php?page=$1&action=$2 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/$ index.php?page=$1&action=$2 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)$ index.php?page=$1&action=$2&tag1=$3 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/$ index.php?page=$1&action=$2&tag1=$3 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)$ index.php?page=$1&action=$2&tag1=$3&tag2=$4 [QSA,L]
+
+RewriteRule ^([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/([A-Za-z0-9\_\-]+)/$ index.php?page=$1&action=$2&tag1=$3&tag2=$4 [QSA,L]
