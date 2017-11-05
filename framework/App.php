@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 use tree\core\Application;
+use tree\core\L;
 use tree\core\Settings;
 use tree\thememanager\ThemeLoader;
 
@@ -31,8 +32,8 @@ class App extends Application
         parent::__construct();
         $this->initMySqlDatabase();
         $this->initSettings(new Settings());
-
-        $this->setApp($this);
+        $this->initLanguage(new L());
+        $this->initApp($this);
     }
 
 
