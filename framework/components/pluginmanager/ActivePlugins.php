@@ -63,7 +63,6 @@ class ActivePlugins extends Object
     {
 
         foreach ($this->getPluginsIdentifierArray() as $pluginIdentifier):
-
             $this->runPlugin($pluginIdentifier);
         endforeach;
 

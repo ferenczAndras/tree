@@ -28,7 +28,6 @@ use tree\thememanager\ThemeLoader;
 class App extends Application
 {
 
-
     public function __construct($type = null)
     {
         parent::__construct();
