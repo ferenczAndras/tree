@@ -29,7 +29,7 @@ abstract class DatabaseModel extends Object
     /**
      * @var string $table holds the table name for this object
      */
-    protected $table = "";
+    protected $table;
 
 
     /**
@@ -54,6 +54,9 @@ abstract class DatabaseModel extends Object
      */
     public function getTable()
     {
+        if (empty($this->table))
+            throw new EmptyVariableException("Table not defined.");
+
         return $this->table;
     }
 

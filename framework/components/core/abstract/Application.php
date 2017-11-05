@@ -56,6 +56,12 @@ abstract class Application extends Router
     private $db;
 
     /**
+     * This variable holds the app type which is running currently
+     * @var string APP_ADMIN or APP_THEME
+     */
+    protected $appType = "";
+
+    /**
      * Application constructor.
      * @param string $defaultPage default value for page handling
      * @param string $defaultAction default value for action handling
@@ -70,6 +76,28 @@ abstract class Application extends Router
     }
 
     /**
+     * Init the type of the app. We can use this value at plugins and themes to run the correct methods
+     * @param $type String
+     * @throws IllegalAppTypeException
+     */
+    public function initAppType($type)
+    {
+        if ($type === self::$APP_ADMIN || $type === self::$APP_THEME) {
+            $this->appType = $type;
+        } else {
+            throw new IllegalAppTypeException("The $type is not a valid value for running the app.");
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function type()
+    {
+        return $this->appType;
+    }
+
+    /**
      *
      * @param string $host host name
      * @param string $user user name
@@ -78,7 +106,7 @@ abstract class Application extends Router
      */
     protected function initMySqlDatabase($host = DB_HOST, $user = DB_USER, $pass = DB_PASS, $dbName = DB_NAME)
     {
-        $this->db = $db = new MySqlDatabase ($host, $user, $pass, $dbName);
+        $this->db = new MySqlDatabase ($host, $user, $pass, $dbName);
     }
 
     /**
@@ -90,13 +118,16 @@ abstract class Application extends Router
     }
 
     /**
-     * @param $logger
+     * @param $logger \tree\core\Logger;
      */
     public function initLogger($logger)
     {
         $this->add("logger", $logger);
     }
 
+    /**
+     * @return mixed | \tree\core\Logger
+     */
     public function logger()
     {
         return $this->get("logger");
@@ -113,8 +144,6 @@ abstract class Application extends Router
         $this->add("language", $languageHandler);
     }
 
-
-
     /**
      * Get's the current language handler method
      * @return mixed | \tree\core\L
@@ -122,6 +151,22 @@ abstract class Application extends Router
     public function language()
     {
         return $this->get("language");
+    }
+
+    /**
+     * @param $pluginsManager \tree\pluginmanager\ActivePlugins
+     */
+    public function initActivePlugins($pluginsManager)
+    {
+        $this->add("activePlugins", $pluginsManager);
+    }
+
+    /**
+     * @return null | \tree\pluginmanager\ActivePlugins
+     */
+    public function activePlugins()
+    {
+        return $this->get("activePlugins");
     }
 
     /**
@@ -133,7 +178,7 @@ abstract class Application extends Router
     }
 
     /**
-     * @return \tree\core\Settings
+     * @return null | \tree\core\Settings
      */
     public function settings()
     {
@@ -160,7 +205,7 @@ abstract class Application extends Router
      */
     public function get($name)
     {
-        return $this->components[$name];
+        return isset($this->components[$name]) ? $this->components[$name] : null;
     }
 
     /**
@@ -174,7 +219,7 @@ abstract class Application extends Router
     /**
      * Sets up the current application object, so later on it can
      * be get via the Application::app()
-     * @param $app
+     * @param $app Application
      */
     public function initApp($app)
     {

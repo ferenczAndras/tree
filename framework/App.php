@@ -10,8 +10,10 @@ if (!defined('ABSPATH')) {
 }
 
 use tree\core\Application;
+use tree\core\IllegalAppTypeException;
 use tree\core\L;
 use tree\core\Settings;
+use tree\pluginmanager\ActivePlugins;
 use tree\thememanager\ThemeLoader;
 
 /**
@@ -27,26 +29,31 @@ class App extends Application
 {
 
 
-    public function __construct()
+    public function __construct($type = null)
     {
         parent::__construct();
+        $this->initAppType($type);
         $this->initMySqlDatabase();
         $this->initSettings(new Settings());
         $this->initLanguage(new L());
+        $this->initActivePlugins(new ActivePlugins());
         $this->initApp($this);
     }
 
 
-    public function run($type = null)
+    public function run()
     {
-        if ($type === Application::$APP_THEME) {
+        $this->activePlugins()->load();
+
+        if ($this->type() === Application::$APP_THEME) {
             ThemeLoader::load();
-        } else if ($type === Application::$APP_ADMIN && defined('ADMINPATH')) {
+        } else if ($this->type() === Application::$APP_ADMIN && defined('ADMINPATH')) {
             echo App::$APP_ADMIN;
-            echo "NOT IMPLEMENTED";
-            return;
+
+            throw new IllegalAppTypeException();
+            
         } else
-            return;
+            throw new IllegalAppTypeException();
 
     }
 

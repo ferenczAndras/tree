@@ -29,7 +29,8 @@ require_once __DIR__ . '/core/Core.php';
 //require_once './admin/Admin.php';
 //
 //require_once './filemanager/FileManager.php';
-//
-//require_once './pluginmanager/PluginManager.php';
-//
+
+
+require_once __DIR__ . '/pluginmanager/PluginManager.php';
+
 require_once __DIR__ . '/thememanager/ThemeManager.php';

@@ -32,10 +32,19 @@ abstract class Theme extends Object
     public $assets;
 
     /**
-     * hold the current theme base directory path
+     * Holds the current theme base directory path
      * @var String
      */
     public $dir;
+
+    /**
+     * Returns the current theme base directory path
+     * @return String
+     */
+    public function getDir()
+    {
+        return $this->dir;
+    }
 
     /**
      * Set the current Asset variable for this theme
