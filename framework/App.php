@@ -51,7 +51,7 @@ class App extends Application
             echo App::$APP_ADMIN;
 
             throw new IllegalAppTypeException();
-            
+
         } else
             throw new IllegalAppTypeException();
 

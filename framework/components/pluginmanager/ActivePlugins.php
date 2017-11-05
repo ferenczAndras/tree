@@ -5,6 +5,7 @@ namespace tree\pluginmanager;
 use tree\App as App;
 use tree\core\Object;
 use tree\core\Plugin;
+use tree\core\PluginLoaderException;
 use tree\core\Settings;
 
 /**
@@ -58,13 +59,58 @@ class ActivePlugins extends Object
 
     }
 
+    public function runAllThePlugins()
+    {
+
+        foreach ($this->getPluginsIdentifierArray() as $pluginIdentifier):
+
+            $this->runPlugin($pluginIdentifier);
+        endforeach;
+
+    }
+
+    public function runPlugin($pluginIdentifier)
+    {
+        try {
+            $pluginLoader = CONTENTPATH . "/plugins/" . $pluginIdentifier . "/autoload.php";
+
+            if (!file_exists($pluginLoader)) {
+                throw new PluginLoaderException ("Unable to load the $pluginIdentifier plugin.");
+            } else {
+                require_once $pluginLoader;
+            }
+
+            $class = ucfirst($pluginIdentifier);
+
+            $pluginClass = "plugin\\$pluginIdentifier" . "\\$class";
+
+            if (class_exists($pluginClass)) {
+
+                $theme = new $pluginClass();
+
+                $theme->run();
+
+            } else {
+                throw new PluginLoaderException("Unable to initialize the $pluginIdentifier plugin main class. ");
+            }
+
+        } catch (\Exception $e) {
+            echo "Message : " . $e->getMessage();
+            echo "Code : " . $e->getCode();
+            die("Unable to load the current theme.\n");
+        }
+    }
+
+    /**
+     * @param $identity String
+     */
     public function addPluginIdentifier($identity)
     {
         $this->pluginIdentifierss[] = $identity;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getPluginsIdentifierArray()
     {

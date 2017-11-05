@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/UnknownMethodException.php';
 require_once __DIR__ . '/ThemeLoaderException.php';
+require_once __DIR__ . '/PluginLoaderException.php';
 require_once __DIR__ . '/UnImplementedMethodException.php';
 require_once __DIR__ . '/IllegalAppTypeException.php';
 require_once __DIR__ . '/EmptyVariableException.php';

@@ -5,10 +5,12 @@ namespace tree\core;
 /**
  * No direct access to this file.
  */
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
+use tree\App as App;
 
 /**
  * Class      Plugin abstract class
@@ -65,4 +67,30 @@ class Plugin extends Object
     }
 
 
+    /**
+     *
+     */
+    public function run()
+    {
+        if (App::app()->type() === App::$APP_THEME)
+            $this->runTheme();
+        else if (App::app()->type() === App::$APP_ADMIN)
+            $this->runAdmin();
+    }
+
+    /**
+     *
+     */
+    protected function runTheme()
+    {
+        throw new UnImplementedMethodException("runTheme() must be implemented in the plugin");
+    }
+
+    /**
+     *
+     */
+    protected function runAdmin()
+    {
+        throw new UnImplementedMethodException("runAdmin() must be implemented in the plugin");
+    }
 }
