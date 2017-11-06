@@ -912,7 +912,7 @@ class MySqlDatabase
     /**
      * Helper function to add variables into bind parameters array
      *
-     * @param string Variable value
+     * @param string $value Variable value
      */
     protected function _bindParam($value)
     {
@@ -1365,6 +1365,7 @@ class MySqlDatabase
      * Method attempts to prepare the SQL query
      * and throws an error if there was a problem.
      *
+     * @throws Exception
      * @return mysqli_stmt
      */
     protected function _prepareQuery()
@@ -1510,6 +1511,7 @@ class MySqlDatabase
      *        Default null;
      * @param string $func Initial date
      *
+     * @throws Exception
      * @return string
      */
     public function interval($diff, $func = "NOW()")
@@ -1759,7 +1761,7 @@ class MySqlDatabase
     }
 
     /**
-     * Pagination wraper to get()
+     * Pagination wrapper to get()
      *
      * @access public
      * @param string $table The name of the database table to work with

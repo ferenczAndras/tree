@@ -20,4 +20,4 @@ if (!defined('ABSPATH')) {
 
 define("TREE_DEBUG", true);
 
-require_once __DIR__ . 'db.php';
+require_once __DIR__ . '/db.php';
