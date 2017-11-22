@@ -16,7 +16,7 @@ use mysqli_stmt;
 /**
  * MySqlDatabase Class
  *
- * @category  Database Access
+ * @category  Database Access 5.4 Mysql
  * @package   MySqlDatabase
  * @author    Jeffery Way <jeffrey@jeffrey-way.com>
  * @author    Josh Campbell <jcampbell@ajillion.com>
