@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 
 
 require_once __DIR__ . '/ActivePlugins.php';
-
+require_once __DIR__ . '/RequiredPlugins.php';
 
 /**
  * Required Classes only for the Admin panel

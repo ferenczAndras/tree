@@ -9,8 +9,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use admin\components\AdminSettings;
 use tree\core\Application;
-use tree\core\IllegalAppTypeException;
 use tree\core\L;
 use tree\core\Settings;
 use tree\pluginmanager\ActivePlugins;
@@ -33,27 +33,31 @@ class App extends Application
         parent::__construct();
         $this->initAppType($type);
         $this->initMySqlDatabase();
-        $this->initSettings(new Settings());
         $this->initLanguage(new L());
-        $this->initActivePlugins(new ActivePlugins());
+
+        if ($type === Application::$APP_THEME) {
+
+            $this->initSettings(new Settings());
+            $this->initActivePlugins(new ActivePlugins());
+
+        } else {
+            $this->initSettings(new AdminSettings());
+        }
+
         $this->initApp($this);
     }
 
 
     public function run()
     {
-        $this->activePlugins()->load();
+        if ($this === Application::$APP_THEME) {
+            $this->activePlugins()->load();
+        } else {
+            $this->settings()->loadAdminValuesAfterInit();
+        }
 
-        if ($this->type() === Application::$APP_THEME) {
-            ThemeLoader::load();
-        } else if ($this->type() === Application::$APP_ADMIN && defined('ADMINPATH')) {
-            echo App::$APP_ADMIN;
-
-            throw new IllegalAppTypeException();
-
-        } else
-            throw new IllegalAppTypeException();
-
+        ThemeLoader::load($this->type());
     }
+
 
 }

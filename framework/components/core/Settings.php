@@ -20,7 +20,7 @@ if (!defined("TREE_SETTINGS"))
 use tree\App as App;
 
 /**
- * Class      Facebook class for seo and meta usage
+ * Class      Settings class
  * @category  Core Components
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
@@ -31,7 +31,15 @@ use tree\App as App;
 class Settings extends DatabaseModel
 {
 
+    /**
+     * @var array
+     */
+    private $values = array();
+
+
     protected static $setting_key = "setting_key";
+
+
     protected static $setting_value = "setting_value";
 
 
@@ -117,6 +125,48 @@ class Settings extends DatabaseModel
         else $this->addMessage(" Something went wrong while we tried to create the $key key.");
     }
 
+    /**
+     *
+     * Loads and stores an array of values and its defaults
+     *
+     * $array = [];
+     *
+     * method to call: loadValues($array);
+     *
+     * @param array $valueArray
+     */
+    protected function initValues($valueArray = array())
+    {
+        foreach ($valueArray as $value) {
+            $this->loadValue($value['identifier'], $value['default']);
+        }
+    }
+
+    protected function loadValue($identifier, $default = null)
+    {
+        $value = $this->get($identifier, $default);
+        $this->storeValue($identifier, $value);
+    }
+
+
+    protected function storeValue($identifier, $value)
+    {
+
+        if (is_array($value)) {
+            if (isset($value[self::$setting_value])) {
+                $value = $value[self::$setting_value];
+            }
+        }
+
+        $this->values[$identifier] = $value;
+    }
+
+    protected function getStoredValue($identifier, $default = null)
+    {
+        if (isset($this->values[$identifier])) return $this->values[$identifier];
+        return $default;
+    }
+
 
     /**
      *
@@ -125,7 +175,8 @@ class Settings extends DatabaseModel
      * @param $setting mixed
      * @return mixed
      */
-    public static function getValue($setting)
+    public
+    static function getValue($setting)
     {
         if ($setting != null && is_array($setting)) {
             if (isset($setting[self::$setting_value])) {
@@ -142,7 +193,8 @@ class Settings extends DatabaseModel
      * @param $setting mixed
      * @return mixed
      */
-    public static function getKey($setting)
+    public
+    static function getKey($setting)
     {
         if ($setting != null && is_array($setting)) {
             if (isset($setting[self::$setting_key])) {

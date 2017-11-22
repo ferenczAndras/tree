@@ -20,6 +20,7 @@ require_once __DIR__ . '/Object.php';
 require_once __DIR__ . '/DatabaseModel.php';
 require_once __DIR__ . '/BaseModel.php';
 require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/AdminController.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Application.php';
 require_once __DIR__ . '/Plugin.php';

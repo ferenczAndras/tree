@@ -3,8 +3,10 @@
 namespace tree\thememanager;
 
 
+use admin\AdminTheme;
 use Exception;
 use tree\App as App;
+use tree\core\IllegalAppTypeException;
 use tree\core\Object;
 use tree\core\Settings;
 use tree\core\Theme;
@@ -30,7 +32,19 @@ if (!defined('ABSPATH')) {
 class ThemeLoader extends Object
 {
 
-    public static function load()
+    public static function load($type = null)
+    {
+        if ($type === App::$APP_THEME) {
+            ThemeLoader::loadThemes();
+        } else if ($type === App::$APP_ADMIN && defined('ADMINPATH')) {
+            ThemeLoader::loadAdmin();
+        } else {
+            throw new IllegalAppTypeException();
+        }
+
+    }
+
+    private static function loadThemes()
     {
 
         $themeIdentifier = App::app()->settings()->get(Theme::$CURRENT_THEME_SETTINGS_KEY);
@@ -54,6 +68,8 @@ class ThemeLoader extends Object
 
                 $theme = new $themeClass();
 
+                App::app()->initTheme($theme);
+
                 $theme->run();
 
             } else {
@@ -67,5 +83,14 @@ class ThemeLoader extends Object
         }
 
     }
+
+
+    private static function loadAdmin()
+    {
+        $adminTheme = new AdminTheme();
+        App::app()->initTheme($adminTheme);
+        $adminTheme->run();
+    }
+
 
 }

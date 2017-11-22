@@ -23,3 +23,5 @@ require_once __DIR__ . '/PluginLoaderException.php';
 require_once __DIR__ . '/UnImplementedMethodException.php';
 require_once __DIR__ . '/IllegalAppTypeException.php';
 require_once __DIR__ . '/EmptyVariableException.php';
+require_once __DIR__ . '/IllegalInitException.php';
+require_once __DIR__ . '/NotInitializedException.php';

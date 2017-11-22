@@ -61,6 +61,14 @@ abstract class Application extends Router
      */
     protected $appType = "";
 
+
+    /**
+     * Holds the current theme object
+     * @var \tree\core\Theme;
+     */
+    protected $theme;
+
+
     /**
      * Application constructor.
      * @param string $defaultPage default value for page handling
@@ -133,6 +141,30 @@ abstract class Application extends Router
         return $this->get("logger");
     }
 
+
+    /**
+     * @param $theme \tree\core\Theme;
+     * @throws \tree\core\IllegalInitException;
+     */
+    public function initTheme($theme)
+    {
+        if ($this->theme != null)
+            throw new IllegalInitException("Theme already initialized! You can not override during runtime!");
+
+        $this->theme = $theme;
+    }
+
+    /**
+     * @return mixed | \tree\core\Theme
+     * @throws \tree\core\NotInitializedException;
+     */
+    public function theme()
+    {
+        if ($this->theme == null) throw new NotInitializedException("Theme was not initialized!");
+
+        return $this->theme;
+    }
+
     /**
      *
      * Sets the language handler method
@@ -170,7 +202,7 @@ abstract class Application extends Router
     }
 
     /**
-     * @param $settings \tree\core\Settings
+     * @param $settings \tree\core\Settings | \admin\components\AdminSettings;
      */
     public function initSettings($settings)
     {
@@ -178,11 +210,32 @@ abstract class Application extends Router
     }
 
     /**
-     * @return null | \tree\core\Settings
+     * @return \tree\core\Settings | \admin\components\AdminSettings;
      */
     public function settings()
     {
         return $this->get("settings");
+    }
+
+
+    public function initLogin($login)
+    {
+        $this->add("userLogin", $login);
+    }
+
+
+    /**
+     * @return mixed | \tree\components\Login;
+     */
+    public function login()
+    {
+        return $this->get("userLogin");
+    }
+
+
+    public function activityTracker()
+    {
+        return $this->get("activitytracker");
     }
 
     /**
@@ -242,6 +295,19 @@ abstract class Application extends Router
     }
 
     /**
+     * @return string framework directory
+     */
+    public function frameworkDir()
+    {
+        return TREEDIR;
+    }
+
+    public function frameworkGitHub()
+    {
+        return TREEURLGITHUB;
+    }
+
+    /**
      * Checks if the current php is high enough to run the framework
      *
      * @return boolean
@@ -249,7 +315,7 @@ abstract class Application extends Router
     public function checkPhp()
     {
         return true;
-        //version_compare(PHP_VERSION, '5.3.0', '<');
+//        return version_compare(PHP_VERSION, '5.3.7', '<');
     }
 
 }

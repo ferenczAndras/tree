@@ -29,13 +29,24 @@ abstract class Theme extends Object
      * Holds the current theme assets component
      * @var \tree\core\Assets;
      */
-    public $assets;
+    protected $assets;
 
     /**
      * Holds the current theme base directory path
      * @var String
      */
-    public $dir;
+    protected $dir;
+
+
+    /**
+     * List of layouts available.
+     * @main contains all the basic elements for the site: navbar, header
+     * @empty contains only the body html element tag
+     * @ajax it is an empty file, where the @content variable is shown
+     *
+     * @var array
+     */
+    protected $layouts = array("main", "empty", "ajax");
 
     /**
      * Returns the current theme base directory path
@@ -61,6 +72,14 @@ abstract class Theme extends Object
     public function getAssets()
     {
         return $this->assets;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLayouts()
+    {
+        return $this->layouts;
     }
 
     /**

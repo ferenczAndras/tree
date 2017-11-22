@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define("TREEPATH", __DIR__);
+define("TREEDIR", __DIR__);
 
 define("CONTENTPATH", ABSPATH . "/content");
 
@@ -27,6 +27,6 @@ define("TREEURLGITHUB", "https://github.com/ferenczAndras/tree");
 define("FRAMEWORK_URL", "framework");
 
 
-require_once TREEPATH . '/components/autoload.php';
+require_once __DIR__ . '/components/autoload.php';
 
-require_once TREEPATH . '/App.php';
+require_once __DIR__ . '/App.php';

@@ -20,7 +20,7 @@ require_once __DIR__ . '/ThemeLoader.php';
 
 
 /**
- * Required Classes only for the Admin panel
+ * Required Classes only if we are in Admin Mode
  */
 if (defined('ADMINPATH')):
 
