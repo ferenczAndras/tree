@@ -15,4 +15,16 @@ ALTER TABLE `tree_settings`
 
 
 
+CREATE TABLE `tree_site_activity` (
+  `activity_id` int(11) NOT NULL,
+  `user_name` text NOT NULL,
+  `action` text NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `time` int(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `tree_site_activity`
+  ADD PRIMARY KEY (`activity_id`);
+
+
 */
