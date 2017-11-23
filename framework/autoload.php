@@ -24,7 +24,7 @@ define("TREEURL", "http://treeframework.affarit.com");
 
 define("TREEURLGITHUB", "https://github.com/ferenczAndras/tree");
 
-define("FRAMEWORK_URL", "framework");
+define("FRAMEWORK_URL", "tree/framework");
 
 
 require_once __DIR__ . '/components/autoload.php';

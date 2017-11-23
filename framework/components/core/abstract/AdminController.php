@@ -104,6 +104,7 @@ abstract class AdminController extends Object
 
         $actionFunction = 'action' . ucfirst($action);
 
+
         //if the action is listed in actions array, we trigger that function
         if (in_array($action, $this->actions)) {
 

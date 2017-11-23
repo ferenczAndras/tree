@@ -24,7 +24,7 @@ require_once __DIR__ . '/database/Database.php';
 require_once __DIR__ . '/core/Core.php';
 
 
-//require_once './email/Email.php';
+require_once __DIR__ . '/email/Email.php';
 
 /**
  * Required Classes only if we are in Admin Mode

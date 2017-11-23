@@ -58,7 +58,7 @@ class Router extends Object
      */
     public function getAction()
     {
-        return $this->page;
+        return $this->action;
     }
 
     /**

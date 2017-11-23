@@ -21,17 +21,42 @@ if (!defined('ABSPATH')) {
 class L extends Object
 {
 
+    private $languageArray = array();
+
+    public static function t($message, $package = "TreeFramework")
+    {
+        self::L()->addOneMessage($message, $package);
+        return $message;
+    }
+
+
+    private function addOneMessage($message, $package)
+    {
+
+        if (isset($this->languageArray[$package])) {
+
+            $messageArray = $this->languageArray[$package];
+
+            if (!in_array($message, $messageArray)) {
+                $this->languageArray[$package][] = $message;
+            }
+
+        } else {
+            $this->languageArray[$package] = [$message];
+        }
+    }
+
+    public function writeMessages()
+    {
+        var_dump($this->languageArray);
+    }
+
+
     protected static $instance;
 
     public function  __construct()
     {
         self::$instance = $this;
-    }
-
-
-    public static function t($message, $package = "tree")
-    {
-        return $message;
     }
 
     /**

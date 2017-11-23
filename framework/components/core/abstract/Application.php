@@ -217,7 +217,9 @@ abstract class Application extends Router
         return $this->get("settings");
     }
 
-
+    /**
+     * @param $login mixed | \tree\components\Login;
+     */
     public function initLogin($login)
     {
         $this->add("userLogin", $login);
@@ -232,7 +234,17 @@ abstract class Application extends Router
         return $this->get("userLogin");
     }
 
+    /**
+     * @param $activity \tree\components\ActivityTracker;
+     */
+    public function initActivityTracker($activity)
+    {
+        $this->add("activitytracker", $activity);
+    }
 
+    /**
+     * @return mixed | \tree\components\ActivityTracker;
+     */
     public function activityTracker()
     {
         return $this->get("activitytracker");

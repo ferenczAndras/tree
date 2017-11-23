@@ -89,9 +89,9 @@ class HtmlUtils
 
     public static function getTreeFootprint()
     {
-        $html = "<div style='width: 100%;margin-top: 10px; text-align: center;'>";
+        $html = "<div style='width:100%;margin-top:10px;text-align: center;'>";
         $html .= "Powered by the <strong> Tree Framework</strong><br/>";
-        $html .= '<a href="' . TREEURL . '" target="_blank">' . '<img style="height: 75px" src="' . UrlUtils::getFrameworkUrl("assets/tree/logo.png") . '" />' . "</a>";
+        $html .= '<a href="' . TREEURL . '" target="_blank">' . '<img style="height: 75px" src="' . \tree\App::getFrameworkUrl("assets/tree/logo.png") . '" />' . "</a>";
         $html .= "</div>";
         return $html;
     }

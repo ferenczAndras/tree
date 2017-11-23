@@ -21,6 +21,11 @@ if (!defined('ABSPATH')) {
 abstract class Theme extends Object
 {
     /**
+     * @var string used for saving wording in databases
+     */
+    public static $WORDING = "TreeFramework";
+
+    /**
      * @var string used to get the current theme settings
      */
     public static $CURRENT_THEME_SETTINGS_KEY = "currentTheme";
