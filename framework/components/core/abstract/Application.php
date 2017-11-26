@@ -80,6 +80,10 @@ abstract class Application extends Router
             die("Not supported PHP version.");
         }
 
+        if (!$this->isInstalled()) {
+            self::redirectInSite("install");
+        }
+
         $this->initUrlParams($defaultPage, $defaultAction);
     }
 
@@ -314,9 +318,31 @@ abstract class Application extends Router
         return TREEDIR;
     }
 
+    /**
+     * @return string
+     */
     public function frameworkGitHub()
     {
         return TREEURLGITHUB;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return defined("APP_INSTALLED") ? APP_INSTALLED : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDevelopment()
+    {
+        if (defined("TREE_DEVELOPMENT")) {
+            return TREE_DEVELOPMENT;
+        }
+        return false;
     }
 
     /**

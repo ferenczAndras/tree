@@ -23,7 +23,6 @@ require_once __DIR__ . '/database/Database.php';
 
 require_once __DIR__ . '/core/Core.php';
 
-
 require_once __DIR__ . '/email/Email.php';
 
 /**
@@ -33,10 +32,10 @@ if (defined('ADMINPATH')):
 
     require_once __DIR__ . '/admin/Admin.php';
 
+
+    require_once __DIR__ . '/filemanager/FileManager.php';
+
 endif;
-
-
-//require_once './filemanager/FileManager.php';
 
 
 require_once __DIR__ . '/pluginmanager/PluginManager.php';

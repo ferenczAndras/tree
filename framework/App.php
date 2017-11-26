@@ -50,9 +50,9 @@ class App extends Application
 
     public function run()
     {
-        if ($this === Application::$APP_THEME) {
+        if ($this->type() === Application::$APP_THEME) {
             $this->activePlugins()->load();
-        } else {
+        } else if ($this->type() === Application::$APP_ADMIN) {
             $this->settings()->loadAdminValuesAfterInit();
         }
 

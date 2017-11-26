@@ -35,7 +35,7 @@ class ActivePlugins extends Object
     /**
      * @var array list of the active plugins
      */
-    private $pluginIdentifierss;
+    private $pluginIdentifiers;
 
     /**
      * ActivePlugins constructor.
@@ -105,7 +105,7 @@ class ActivePlugins extends Object
      */
     public function addPluginIdentifier($identity)
     {
-        $this->pluginIdentifierss[] = $identity;
+        $this->pluginIdentifiers[] = $identity;
     }
 
     /**
@@ -113,7 +113,7 @@ class ActivePlugins extends Object
      */
     public function getPluginsIdentifierArray()
     {
-        return $this->pluginIdentifierss;
+        return $this->pluginIdentifiers;
     }
 
     /**
