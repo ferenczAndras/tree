@@ -11,3 +11,16 @@ This is the dev-repository, for the Tree framework.
 > - Themes
 > - Plugins
 > - How it Works
+
+
+
+
+
+
+> ** THE TREE FRAMEWORK **
+
+> framework
+>   -- assets
+>   -- components
+>   -- tools
+>   -- views
