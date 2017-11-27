@@ -16,7 +16,6 @@ if (!defined('ABSPATH') || !defined('ADMINPATH')) {
     exit;
 }
 
-
 define("TABLE_USERS", "users");
 
 

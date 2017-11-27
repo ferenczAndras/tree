@@ -16,3 +16,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/classes/PHPMailer.php';
+require_once __DIR__ . '/classes/Stmp.php';
+require_once __DIR__ . '/classes/Webhook.php';
+require_once __DIR__ . '/classes/MailChimp.php';
+require_once __DIR__ . '/classes/Batch.php';
+
+require_once __DIR__ . '/generator/EmailGenerator.php';
