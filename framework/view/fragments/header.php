@@ -23,9 +23,9 @@
         <meta name="generator" content="tree">
 
 
-    <?php foreach ($assets->meta as $meta): ?>
-    <meta name="<?= $meta['name'] ?>" content="<?= $meta['value'] ?>">
-    <?php endforeach; ?>
+        <?php foreach ($assets->meta as $meta): ?>
+            <meta name="<?= $meta['name'] ?>" content="<?= $meta['value'] ?>">
+        <?php endforeach; ?>
 
 
         <!-- Gives information about an author or another person -->
@@ -39,29 +39,25 @@
         <!--        <link rel="next" href="https://example.com/atomFeed.php?page=4">-->
         <!--        <link rel="previous" href="https://example.com/atomFeed.php?page=2">-->
         <!--        <link rel="last" href="https://example.com/atomFeed.php?page=147">-->
-        <!---->
-        <!--      -->
+
         <!--        <!-- Feeds -->
         <!--        <link rel="alternate" href="https://feeds.feedburner.com/example" type="application/rss+xml" title="RSS">-->
         <!--        <link rel="alternate" href="https://example.com/feed.atom" type="application/atom+xml" title="Atom 0.3">-->
-        <!---->
-        <!--         -->
 
-        <!-- facebbook -->
 
-    <?php if (isset($assets->facebook->openGraph)):
-    foreach ($assets->facebook->openGraph as $og): ?>
-    <meta property="<?= $og['name'] ?>" content="<?= $og['value'] ?>">
-    <?php endforeach ?>
-    <?php endif; ?>
+        <?php if (isset($assets->facebook->openGraph)):
+            foreach ($assets->facebook->openGraph as $og): ?>
+                <meta property="<?= $og['name'] ?>" content="<?= $og['value'] ?>">
+            <?php endforeach ?>
+        <?php endif; ?>
         <!--- twitter -->
 
 
-    <?php if (isset($assets->twitter->meta)):
-    foreach ($assets->twitter->meta as $og): ?>
-    <meta name="<?= $og['name'] ?>" content="<?= $og['value'] ?>">
-    <?php endforeach ?>
-    <?php endif; ?>
+        <?php if (isset($assets->twitter->meta)):
+                foreach ($assets->twitter->meta as $og): ?>
+                    <meta name="<?= $og['name'] ?>" content="<?= $og['value'] ?>">
+            <?php endforeach ?>
+        <?php endif; ?>
 
 
         <!-- GOOGLE + -->
@@ -96,8 +92,7 @@
 
         <!-- Pinned Site -->
         <!--        <link rel="mask-icon" href="path/to/icon.svg" color="red">-->
-        <!---->
-        <!---->
+
         <!--        <!--        Google Android-->
         <!---->
         <!--        <meta name="theme-color" content="#E64545">-->
@@ -122,12 +117,10 @@
         <!-- More info: http://applinks.org/documentation/ -->
 
 
-        <!-- Generates all the css provided by the AssetsManager  -->
     <?php foreach ($assets->css as $css): ?>
     <link rel="stylesheet" href="<?= App::app()->getUrl($css) ?>">
     <?php endforeach; ?>
 
-        <!-- Gerenates all the head scripts provided by the AssetsManager -->
     <?php foreach ($assets->headScrip as $src): ?>
         <script src="<?= App::app()->getUrl($src) ?>"></script>
     <?php endforeach; ?>
