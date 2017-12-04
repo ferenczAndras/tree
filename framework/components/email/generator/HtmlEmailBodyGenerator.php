@@ -4,7 +4,7 @@ namespace tree\email\generator;
 
 use tree\core\Object;
 
-class EmailGenerator extends Object
+class HtmlEmailBodyGenerator extends Object
 {
     /**
      * This type is like:
