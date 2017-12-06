@@ -10,14 +10,12 @@
  * @link      http://www.affarit.com
  */
 
-
 /**
  * No direct access to this file.
  */
 if (!defined('ABSPATH')) {
     exit;
 }
-
 
 /****
  * ------------------------------
@@ -45,3 +43,8 @@ require_once __DIR__ . '/db.php';
 /****
  * ------------------------------
  ****/
+
+if (defined("ADMINPATH")):
+
+    require_once __DIR__ . '/email.php';
+endif;
