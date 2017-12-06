@@ -12,7 +12,10 @@ if (!defined('ABSPATH')) {
 use PDO;
 use PDOException;
 use PHPMailer;
-use tree\components\email\Email;
+use tree\App;
+use tree\core\L;
+use tree\core\Settings;
+use tree\email\generator\HtmlEmailBodyGenerator;
 
 /**
  *            Login Class
@@ -196,8 +199,8 @@ class Login
 
     /**
      * Search into database for the user data of user_name specified as parameter
-     * @return user data as an object if existing user
-     * @return false if user_name is not found in the database
+     * @param user_name string
+     * @return mixed data as an object if existing user orif user_name is not found in the database
      * TODO: @devplanete This returns two different types. Maybe this is valid, but it feels bad. We should rework this.
      * TODO: @devplanete After some resarch I'm VERY sure that this is not good coding style! Please fix this.
      */
@@ -277,7 +280,7 @@ class Login
             }
             // A cookie has been used but is not valid... we delete it
             $this->deleteRememberMeCookie();
-            $this->errors[] = MESSAGE_COOKIE_INVALID;
+            $this->errors[] = L::t("Invalid cookie", "AdminLogin");
         }
         return false;
     }
@@ -291,9 +294,9 @@ class Login
     private function loginWithPostData($user_name, $user_password, $user_rememberme)
     {
         if (empty($user_name)) {
-            $this->errors[] = MESSAGE_USERNAME_EMPTY;
+            $this->errors[] = L::t("Username field was empty!", "AdminRegistration");;
         } else if (empty($user_password)) {
-            $this->errors[] = MESSAGE_PASSWORD_EMPTY;
+            $this->errors[] = L::t("Password field was empty!", "AdminRegistration");;
 
             // if POST data (from login form) contains non-empty user_name and non-empty user_password
         } else {
@@ -317,36 +320,40 @@ class Login
             if (!isset($result_row->user_id)) {
                 // was MESSAGE_USER_DOES_NOT_EXIST before, but has changed to MESSAGE_LOGIN_FAILED
                 // to prevent potential attackers showing if the user exists
-                $this->errors[] = MESSAGE_LOGIN_FAILED;
+                $this->errors[] = L::t("Login failed.", "AdminLogin");
                 if ($this->trackactivity && $this->activityTracker != null) {
 
-                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), "The user dose not exists in the database.");
+                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), L::t("The user dose not exists in the database.", "AdminLogin"));
                 }
             } else if (($result_row->user_failed_logins >= 3) && ($result_row->user_last_failed_login > (time() - 30))) {
 
-                $this->errors[] = MESSAGE_PASSWORD_WRONG_3_TIMES;
+                $this->errors[] = L::t("You have entered an incorrect password 3 or more times already. Please wait 30 seconds to try again.", "AdminLogin");
+
                 if ($this->trackactivity && $this->activityTracker != null) {
-                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), MESSAGE_PASSWORD_WRONG_3_TIMES);
+                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), L::t("You have entered an incorrect password 3 or more times already. Please wait 30 seconds to try again.", "AdminLogin"));
                 }
+
                 // using PHP 5.5's password_verify() function to check if the provided passwords fits to the hash of that user's password
             } else if (!password_verify($user_password, $result_row->user_password_hash)) {
+
                 // increment the failed login counter for that user
                 $sth = $this->db_connection->prepare('UPDATE users '
                     . 'SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login '
                     . 'WHERE user_name = :user_name OR user_email = :user_name');
                 $sth->execute(array(':user_name' => $user_name, ':user_last_failed_login' => time()));
 
-                $this->errors[] = MESSAGE_PASSWORD_WRONG;
+                $this->errors[] = L::t("Wrong password. Try again.", "AdminLogin");
 
                 if ($this->trackactivity && $this->activityTracker != null) {
-                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), MESSAGE_PASSWORD_WRONG);
+                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), L::t("Wrong password. Try again.", "AdminLogin"));
                 }
 
                 // has the user activated their account with the verification email
             } else if ($result_row->user_active != 1) {
-                $this->errors[] = MESSAGE_ACCOUNT_NOT_ACTIVATED;
+
+                $this->errors[] = L::t("Your account is not activated yet. Please click on the confirm link in the mail.", "AdminLogin");
                 if ($this->trackactivity && $this->activityTracker != null) {
-                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), MESSAGE_ACCOUNT_NOT_ACTIVATED);
+                    $this->activityTracker->newLoginActivity($user_name, $user_password, $this->get_client_ip(), L::t("Your account is not activated yet. Please click on the confirm link in the mail.", "AdminLogin"));
                 }
             } else {
                 // write user data into PHP SESSION [a file on your server]
@@ -441,8 +448,8 @@ class Login
                 $sth->execute(array(':user_id' => $_SESSION['user_id']));
             }
         }
-        // set the rememberme-cookie to ten years ago (3600sec * 365 days * 10).
-        // that's obivously the best practice to kill a cookie via php
+        // set the remember me-cookie to ten years ago (3600sec * 365 days * 10).
+        // that's obliviously the best practice to kill a cookie via php
         // @see http://stackoverflow.com/a/686166/1114320
         setcookie('rememberme', false, time() - (3600 * 3650), '/', COOKIE_DOMAIN);
     }
@@ -458,7 +465,7 @@ class Login
         session_destroy();
 
         $this->user_is_logged_in = false;
-        $this->messages[] = MESSAGE_LOGGED_OUT;
+        $this->messages[] = L::t("You have been logged out.", "AdminLogin");
     }
 
     /**
@@ -472,6 +479,7 @@ class Login
 
     /**
      * Edit the user's name, provided in the editing form
+     * @param $user_name
      */
     public function editUserName($user_name)
     {
@@ -479,19 +487,19 @@ class Login
         $user_name = substr(trim($user_name), 0, 64);
 
         if (!empty($user_name) && $user_name == $_SESSION['user_name']) {
-            $this->errors[] = MESSAGE_USERNAME_SAME_LIKE_OLD_ONE;
+            $this->errors[] = L::t("Sorry, that username is the same as your current one. Please choose another one.", "AdminLogin");
 
             // username cannot be empty and must be azAZ09 and 2-64 characters
             // TODO: maybe this pattern should also be implemented in Registration.php (or other way round)
         } elseif (empty($user_name) || !preg_match("/^(?=.{2,64}$)[a-zA-Z][a-zA-Z0-9]*(?: [a-zA-Z0-9]+)*$/", $user_name)) {
-            $this->errors[] = MESSAGE_USERNAME_INVALID;
+            $this->errors[] = L::t("Username field was invalid!", "AdminRegistration");
 
         } else {
             // check if new username already exists
             $result_row = $this->getUserData($user_name);
 
             if (isset($result_row->user_id)) {
-                $this->errors[] = MESSAGE_USERNAME_EXISTS;
+                $this->errors[] = L::t("Sorry, that username is already taken. Please choose another one.", "AdminLogin");
             } else {
                 // write user's new data into database
                 $query_edit_user_name = $this->db_connection->prepare('UPDATE users SET user_name = :user_name WHERE user_id = :user_id');
@@ -501,9 +509,9 @@ class Login
 
                 if ($query_edit_user_name->rowCount()) {
                     $_SESSION['user_name'] = $user_name;
-                    $this->messages[] = MESSAGE_USERNAME_CHANGED_SUCCESSFULLY . $user_name;
+                    $this->messages[] = L::t("Your username has been changed successfully. New username is ", "AdminLogin") . $user_name;
                 } else {
-                    $this->errors[] = MESSAGE_USERNAME_CHANGE_FAILED;
+                    $this->errors[] = L::t("Sorry, your chosen username renaming failed", "AdminLogin");
                 }
             }
         }
@@ -511,6 +519,7 @@ class Login
 
     /**
      * Edit the user's email, provided in the editing form
+     * @param $user_email
      */
     public function editUserEmail($user_email)
     {
@@ -518,10 +527,10 @@ class Login
         $user_email = substr(trim($user_email), 0, 64);
 
         if (!empty($user_email) && $user_email == $_SESSION["user_email"]) {
-            $this->errors[] = MESSAGE_EMAIL_SAME_LIKE_OLD_ONE;
+            $this->errors[] = L::t("Sorry, that email address is the same as your current one. Please choose another one.", "AdminLogin");
             // user mail cannot be empty and must be in email format
         } elseif (empty($user_email) || !filter_var($user_email, FILTER_VALIDATE_EMAIL)) {
-            $this->errors[] = MESSAGE_EMAIL_INVALID;
+            $this->errors[] = L::t("Your email address is not in a valid email format or is empty.", "AdminRegistration");;
 
         } else if ($this->databaseConnection()) {
             // check if new email already exists
@@ -553,19 +562,21 @@ class Login
 
     /**
      * Edit the user's password, provided in the editing form
+     * @param $user_password_old
+     * @param $user_password_new
+     * @param $user_password_repeat
      */
     public function editUserPassword($user_password_old, $user_password_new, $user_password_repeat)
     {
         if (empty($user_password_new) || empty($user_password_repeat) || empty($user_password_old)) {
-            $this->errors[] = MESSAGE_PASSWORD_EMPTY;
+            $this->errors[] = L::t("Password field was empty!", "AdminRegistration");
             // is the repeat password identical to password
         } elseif ($user_password_new !== $user_password_repeat) {
-            $this->errors[] = MESSAGE_PASSWORD_BAD_CONFIRM;
+            $this->errors[] = L::t("Password and password repeat are not the same!", "AdminRegistration");
             // password need to have a minimum length of 6 characters
         } elseif (strlen($user_password_new) < 6) {
-            $this->errors[] = MESSAGE_PASSWORD_TOO_SHORT;
+            $this->errors[] = L::t("Password has a minimum length of 6 characters!", "AdminRegistration");
 
-            // all the above tests are ok
         } else {
             // database query, getting hash of currently logged in user (to check with just provided password)
             $result_row = $this->getUserData($_SESSION['user_name']);
@@ -594,15 +605,15 @@ class Login
 
                     // check if exactly one row was successfully changed:
                     if ($query_update->rowCount()) {
-                        $this->messages[] = MESSAGE_PASSWORD_CHANGED_SUCCESSFULLY;
+                        $this->messages[] = L::t("Your password was changed successfully.", "AdminLogin");;
                     } else {
-                        $this->errors[] = MESSAGE_PASSWORD_CHANGE_FAILED;
+                        $this->errors[] = L::t("Sorry, your password reset failed. Please go back and try again.", "AdminLogin");;
                     }
                 } else {
-                    $this->errors[] = MESSAGE_OLD_PASSWORD_WRONG;
+                    $this->errors[] = L::t("Your old password was wrong.", "AdminLogin");
                 }
             } else {
-                $this->errors[] = MESSAGE_USER_DOES_NOT_EXIST;
+                $this->errors[] = L::t("This user does not exist", "AdminLogin");;
             }
         }
     }
@@ -610,13 +621,15 @@ class Login
     /**
      * Sets a random token into the database (that will verify the user when he/she comes back via the link
      * in the email) and sends the according email.
+     * @param $user_name
+     * @return bool
      */
     public function setPasswordResetDatabaseTokenAndSendMail($user_name)
     {
         $user_name = trim($user_name);
 
         if (empty($user_name)) {
-            $this->errors[] = MESSAGE_USERNAME_EMPTY;
+            $this->errors[] = L::t("Username field was empty!", "AdminRegistration");;
 
         } else {
             // generate timestamp (to see when exactly the user (or an attacker) requested the password reset mail)
@@ -645,10 +658,10 @@ class Login
                     $this->sendPasswordResetMail($user_name, $result_row->user_email, $user_password_reset_hash);
                     return true;
                 } else {
-                    $this->errors[] = MESSAGE_DATABASE_ERROR;
+                    $this->errors[] = L::t("Sorry, your password reset failed. Please go back and try again.", "AdminRegistration");;
                 }
             } else {
-                $this->errors[] = MESSAGE_USER_DOES_NOT_EXIST;
+                $this->errors[] = L::t("This user does not exist", "AdminLogin");
             }
         }
         // return false (this method only returns true when the database entry has been set successfully)
@@ -657,6 +670,11 @@ class Login
 
     /**
      * Sends the password-reset-email.
+     * @param $user_name string
+     * @param $user_email string
+     * @param $user_password_reset_hash string
+     * @return bool managed successfully
+     * @throws \phpmailerException something went wrong
      */
     public function sendPasswordResetMail($user_name, $user_email, $user_password_reset_hash)
     {
@@ -684,35 +702,37 @@ class Login
             $mail->IsMail();
         }
 
-        $mail->From = EMAIL_PASSWORDRESET_FROM;
-        $mail->FromName = EMAIL_PASSWORDRESET_FROM_NAME;
+        $mail->From = EMAIL_ADMIN_FROM;
+        $mail->FromName = App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT);
         $mail->AddAddress($user_email);
-        $mail->Subject = EMAIL_PASSWORDRESET_SUBJECT;
+        $mail->Subject = L::t("Password reset for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT), "AdminLogin");
 
-        $link = EMAIL_PASSWORDRESET_URL . '?user_name=' . urlencode($user_name) . '&verification_code=' . urlencode($user_password_reset_hash);
+        $link = App::getUrl(App::app()->adminFolder() . "/passwordreset") . '?user_name=' . urlencode($user_name) . '&verification_code=' . urlencode($user_password_reset_hash);
 
-        $body = new Email();
+        $body = new HtmlEmailBodyGenerator();
 
-        $mail->Body = $body->setType(Email::$TYPE_CLICK_HERE)
-            ->setTitle(EMAIL_PASSWORDRESET_SUBJECT)
-            ->setMessageBeginning(EMAIL_PASSWORDRESET_CONTENT)
-            ->setMessageEnd(EMAIL_PASSWORDRESET_CONTENT_END)
+        $mail->Body = $body->setType(HtmlEmailBodyGenerator::$TYPE_CLICK_HERE)
+            ->setTitle(L::t("Password reset for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT), "AdminLogin"))
+            ->setMessageBeginning(L::t("Hi there,<br/>You requested a password reset on" . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT) . " for this e-mail address. Please click to the button below to reset your password.<br/> If you don't want too, than you don't have to do anything.", "AdminLogin"))
+            ->setMessageEnd(L::t("Best regards,<br/>" . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT) . "<br/>" . App::getUrl("")))
             ->setLink($link)
             ->render();
 
         $mail->IsHTML(true);
 
         if (!$mail->Send()) {
-            $this->errors[] = MESSAGE_PASSWORD_RESET_MAIL_FAILED . $mail->ErrorInfo;
+            $this->errors[] = L::t("Password reset mail NOT successfully sent! Error: ", "AdminLogin") . $mail->ErrorInfo;
             return false;
         } else {
-            $this->messages[] = MESSAGE_PASSWORD_RESET_MAIL_SUCCESSFULLY_SENT;
+            $this->messages[] = L::t("Password reset mail successfully sent!", "AdminLogin");
             return true;
         }
     }
 
     /**
      * Checks if the verification string in the account verification mail is valid and matches to the user.
+     * @param $user_name string
+     * @param $verification_code string
      */
     public function checkIfEmailVerificationCodeIsValid($user_name, $verification_code)
     {
@@ -733,16 +753,20 @@ class Login
                     // set the marker to true, making it possible to show the password reset edit form view
                     $this->password_reset_link_is_valid = true;
                 } else {
-                    $this->errors[] = MESSAGE_RESET_LINK_HAS_EXPIRED;
+                    $this->errors[] = L::t("Your reset link has expired. Please use the reset link within one hour.", "AdminLogin");
                 }
             } else {
-                $this->errors[] = MESSAGE_USER_DOES_NOT_EXIST;
+                $this->errors[] = L::t("This user does not exist", "AdminLogin");
             }
         }
     }
 
     /**
      * Checks and writes the new password.
+     * @param $user_name
+     * @param $user_password_reset_hash
+     * @param $user_password_new
+     * @param $user_password_repeat
      */
     public function editNewPassword($user_name, $user_password_reset_hash, $user_password_new, $user_password_repeat)
     {
@@ -750,17 +774,19 @@ class Login
         $user_name = trim($user_name);
 
         if (empty($user_name) || empty($user_password_reset_hash) || empty($user_password_new) || empty($user_password_repeat)) {
-            $this->errors[] = MESSAGE_PASSWORD_EMPTY;
+            $this->errors[] = L::t("Password field was empty!", "AdminRegistration");
             // is the repeat password identical to password
         } else if ($user_password_new !== $user_password_repeat) {
-            $this->errors[] = MESSAGE_PASSWORD_BAD_CONFIRM;
+            $this->errors[] = L::t("Password and password repeat are not the same!", "AdminRegistration");
             // password need to have a minimum length of 6 characters
         } else if (strlen($user_password_new) < 6) {
-            $this->errors[] = MESSAGE_PASSWORD_TOO_SHORT;
+            $this->errors[] = L::t("Password has a minimum length of 6 characters!", "AdminRegistration");
             // if database connection opened
         } else if ($this->databaseConnection()) {
+
             // now it gets a little bit crazy: check if we have a constant HASH_COST_FACTOR defined (in config/hashing.php),
             // if so: put the value into $hash_cost_factor, if not, make $hash_cost_factor = null
+
             $hash_cost_factor = (defined('HASH_COST_FACTOR') ? HASH_COST_FACTOR : null);
 
             // crypt the user's password with the PHP 5.5's password_hash() function, results in a 60 character hash string
@@ -781,9 +807,9 @@ class Login
             // check if exactly one row was successfully changed:
             if ($query_update->rowCount() == 1) {
                 $this->password_reset_was_successful = true;
-                $this->messages[] = MESSAGE_PASSWORD_CHANGED_SUCCESSFULLY;
+                $this->messages[] = L::t("Password successfully changed!", "AdminLogin");
             } else {
-                $this->errors[] = MESSAGE_PASSWORD_CHANGE_FAILED;
+                $this->errors[] = L::t("Sorry, your password changing failed.", "AdminLogin");
             }
         }
     }

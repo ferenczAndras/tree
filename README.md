@@ -13,14 +13,10 @@ This is the dev-repository, for the Tree framework.
 > - How it Works
 
 
-
-
-
-
 > ** THE TREE FRAMEWORK **
 
 > framework
->   -- assets
->   -- components
->   -- tools
->   -- views
+> - -- assets
+> - -- components
+> - -- tools
+> - -- views

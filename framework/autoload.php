@@ -26,7 +26,6 @@ define("TREEURLGITHUB", "https://github.com/ferenczAndras/tree");
 
 define("FRAMEWORK_URL", "tree/framework");
 
-
 require_once __DIR__ . '/components/autoload.php';
 
 require_once __DIR__ . '/App.php';

@@ -32,10 +32,20 @@ class Settings extends DatabaseModel
 {
 
     /**
+     * @var string
+     */
+    public static $SETTING_APP_NAME = "appName";
+    public static $SETTING_APP_NAME_DEFAULT = "Tree Application";
+
+
+    /**
+     *  END
+     */
+
+    /**
      * @var array
      */
     private $values = array();
-
 
     protected static $setting_key = "setting_key";
 

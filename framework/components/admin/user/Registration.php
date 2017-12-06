@@ -11,8 +11,10 @@ if (!defined('ABSPATH')) {
 use PDO;
 use PDOException;
 use PHPMailer;
-use tree\components\email\EmailGenerator;
+use tree\App;
 use tree\core\L;
+use tree\core\Settings;
+use tree\email\generator\HtmlEmailBodyGenerator;
 
 /**
  *            Registration Class
@@ -180,7 +182,7 @@ class Registration
                     // send a verification email
                     if ($this->sendVerificationEmail($user_id, $user_email, $user_activation_hash)) {
                         // when mail has been send successfully
-                        $this->messages[] = MESSAGE_VERIFICATION_MAIL_SENT;
+                        $this->messages[] = L::t("Your account has been created successfully and we have sent you an email. Please follow the instructions within that mail in order to activate your account", "AdminRegistration");
                         $this->registration_successful = true;
                     } else {
                         // delete this users account immediately, as we could not send a verification email
@@ -188,26 +190,26 @@ class Registration
                         $query_delete_user->bindValue(':user_id', $user_id, PDO::PARAM_INT);
                         $query_delete_user->execute();
 
-                        $this->errors[] = MESSAGE_VERIFICATION_MAIL_ERROR;
+                        $this->errors[] = L::t("Sorry, we could not send you an verification mail. Your account has NOT been created.", "AdminRegistration");
                     }
                 } else {
-                    $this->errors[] = MESSAGE_REGISTRATION_FAILED;
+                    $this->errors[] = L::t("Sorry, your registration failed. Please go back and try again.", "AdminRegistration");
                 }
             }
         }
     }
+
 
     /*
      * sends an email to the provided email address
      * @return boolean gives back true if mail has been sent, gives back false if no mail could been sent
      */
 
-    public function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
+    public
+    function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
     {
         $mail = new PHPMailer;
 
-        // please look into the config/config.php for much more info on how to use this!
-        // use SMTP or use mail()
         if (EMAIL_USE_SMTP) {
             // Set mailer to use SMTP
             $mail->IsSMTP();
@@ -228,20 +230,20 @@ class Registration
             $mail->IsMail();
         }
 
-        $mail->From = EMAIL_VERIFICATION_FROM;
-        $mail->FromName = EMAIL_VERIFICATION_FROM_NAME;
+        $mail->From = EMAIL_ADMIN_FROM;
+        $mail->FromName = App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT);
         $mail->AddAddress($user_email);
-        $mail->Subject = EMAIL_VERIFICATION_SUBJECT;
+        $mail->Subject = L::t("Account activation for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT), "AdminRegistration");
 
-        $link = EMAIL_VERIFICATION_URL . '?id=' . urlencode($user_id) . '&verification_code=' . urlencode($user_activation_hash);
+        $link = App::getUrl(App::app()->adminFolder()) . '?id=' . urlencode($user_id) . '&verification_code=' . urlencode($user_activation_hash);
 
 
-        $body = new EmailGenerator();
+        $body = new HtmlEmailBodyGenerator();
 
-        $mail->Body = $body->setType(EmailGenerator::$TYPE_CLICK_HERE)
-            ->setTitle(EMAIL_VERIFICATION_SUBJECT)
-            ->setMessageBeginning(EMAIL_VERIFICATION_CONTENT)
-            ->setMessageEnd(EMAIL_VERIFICATION_CONTENT_END)
+        $mail->Body = $body->setType(HtmlEmailBodyGenerator::$TYPE_CLICK_HERE)
+            ->setTitle(L::t("Account activation for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT), "AdminRegistration"))
+            ->setMessageBeginning(L::t("Hi there,<br/>A new account for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT) . " was created with this e-mail address.</br>Please click on the button below to activate your account.<br/> Without this, you are not able to log in.", "AdminRegistration"))
+            ->setMessageEnd(L::t("Best regards,<br/>" . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT) . "<br/>" . App::getUrl(""), "AdminRegistration"))
             ->setLink($link)
             ->render();
 
@@ -249,7 +251,7 @@ class Registration
 
 
         if (!$mail->Send()) {
-            $this->errors[] = MESSAGE_VERIFICATION_MAIL_NOT_SENT . $mail->ErrorInfo;
+            $this->errors[] = L::t("Verification Mail NOT successfully sent! Error: ", "AdminRegistration") . $mail->ErrorInfo;
             return false;
         } else {
             return true;
@@ -258,8 +260,11 @@ class Registration
 
     /**
      * checks the id/verification code combination and set the user's activation status to true (=1) in the database
+     * @param $user_id
+     * @param $user_activation_hash
      */
-    public function verifyNewUser($user_id, $user_activation_hash)
+    public
+    function verifyNewUser($user_id, $user_activation_hash)
     {
         // if database connection opened
         if ($this->databaseConnection()) {
@@ -271,9 +276,9 @@ class Registration
 
             if ($query_update_user->rowCount() > 0) {
                 $this->verification_successful = true;
-                $this->messages[] = MESSAGE_REGISTRATION_ACTIVATION_SUCCESSFUL;
+                $this->messages[] = L::t("Activation was successful! You can now log in!", "AdminRegistration");
             } else {
-                $this->errors[] = MESSAGE_REGISTRATION_ACTIVATION_NOT_SUCCESSFUL;
+                $this->errors[] = L::t("Sorry, no such id/verification code combination here...", "AdminRegistration");
             }
         }
     }

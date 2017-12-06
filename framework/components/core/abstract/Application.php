@@ -71,10 +71,8 @@ abstract class Application extends Router
 
     /**
      * Application constructor.
-     * @param string $defaultPage default value for page handling
-     * @param string $defaultAction default value for action handling
      */
-    public function __construct($defaultPage = "home", $defaultAction = "")
+    public function __construct()
     {
         if (!$this->checkPhp()) {
             die("Not supported PHP version.");
@@ -84,7 +82,7 @@ abstract class Application extends Router
             self::redirectInSite("install");
         }
 
-        $this->initUrlParams($defaultPage, $defaultAction);
+        $this->initUrlParams();
     }
 
     /**
@@ -308,6 +306,14 @@ abstract class Application extends Router
             self::$instance = new $c();
             return self::$instance;
         }
+    }
+
+    /**
+     * @return string admin folder name
+     */
+    public function adminFolder()
+    {
+        return ADMIN_FOLDER;
     }
 
     /**

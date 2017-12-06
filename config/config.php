@@ -18,14 +18,30 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+
+/****
+ * ------------------------------
+ ****/
+
+/**
+ * AUTO GENERATED SOURCE FROM THIS POINT PLEASE DO NOT MODIFY
+ */
+
 /**
  * This field is used for developments purposes. If your website is live, we suggest to delete from config !
  */
+
 define("TREE_DEVELOPMENT", true);
 
 define("TREE_DEBUG", true);
 
-
 define("APP_INSTALLED", true);
 
+define("ADMIN_FOLDER", "admin");
+
 require_once __DIR__ . '/db.php';
+
+
+/****
+ * ------------------------------
+ ****/
