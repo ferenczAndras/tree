@@ -1,5 +1,5 @@
 <?php
-namespace tree\components;
+namespace tree\components\admin;
 
 /**
  * No direct access to this file.

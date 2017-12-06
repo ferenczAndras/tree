@@ -1,5 +1,5 @@
 <?php
-namespace tree\components;
+namespace tree\components\admin;
 
 /**
  * No direct access to this file.
@@ -13,6 +13,7 @@ use PDOException;
 use PHPMailer;
 use tree\App;
 use tree\core\L;
+use tree\core\Object;
 use tree\core\Settings;
 use tree\email\generator\HtmlEmailBodyGenerator;
 
@@ -27,7 +28,7 @@ use tree\email\generator\HtmlEmailBodyGenerator;
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class Registration
+class Registration extends Object
 {
 
     /**
@@ -151,7 +152,7 @@ class Registration
             // TODO: this is really awful!
             if (count($result) > 0) {
                 for ($i = 0; $i < count($result); $i++) {
-                    $this->errors[] = ($result[$i]['user_name'] == $user_name) ? MESSAGE_USERNAME_EXISTS : MESSAGE_EMAIL_ALREADY_EXISTS;
+                    $this->errors[] = ($result[$i]['user_name'] == $user_name) ? L::t("This username already exists", "AdminLogin") : L::t("This email address is already registered. Please use the \"I forgot my password\" page if you don't remember it.", "AdminLogin");
                 }
             } else {
                 // check if we have a constant HASH_COST_FACTOR defined (in config/hashing.php),

@@ -1,5 +1,5 @@
 <?php
-namespace tree\components;
+namespace tree\components\admin;
 
 /**
  * No direct access to this file.
@@ -13,7 +13,9 @@ use PDO;
 use PDOException;
 use PHPMailer;
 use tree\App;
+use tree\core\DatabaseConnectionException;
 use tree\core\L;
+use tree\core\Object;
 use tree\core\Settings;
 use tree\email\generator\HtmlEmailBodyGenerator;
 
@@ -28,7 +30,7 @@ use tree\email\generator\HtmlEmailBodyGenerator;
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class Login
+class Login extends Object
 {
 
     public static $SUPER_ADMIN = "superadmin";
@@ -93,13 +95,15 @@ class Login
 
     /**
      * The activity tracker instance
-     * @var \tree\components\ActivityTracker;
+     * @var \tree\components\admin\ActivityTracker;
      */
     private $activityTracker;
 
     /**
      * the function "__construct()" automatically starts whenever an object of this class is created,
      * you know, when you do "$login = new Login();"
+     * @param null $tracker
+     * @param bool $trackActivity
      */
     public function __construct($tracker = null, $trackActivity = false)
     {
@@ -110,9 +114,6 @@ class Login
         if (!isset($_SESSION)) {
             session_start();
         }
-        // TODO: organize this stuff better and make the constructor very small
-        // TODO: unite Login and Registration classes ?
-
         // check the possible login actions:
         // 1. logout (happen when user clicks logout button)
         // 2. login via session data (happens each time user opens a page on your php project AFTER he has successfully logged in via the login form)
@@ -173,6 +174,7 @@ class Login
     /**
      * Checks if database connection is opened. If not, then this method tries to open it.
      * @return bool Success status of the database connecting process
+     * @throws \tree\core\DatabaseConnectionException exception
      */
     private function databaseConnection()
     {
@@ -190,19 +192,17 @@ class Login
                 $this->db_connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8', DB_USER, DB_PASS);
                 return true;
             } catch (PDOException $e) {
-                $this->errors[] = MESSAGE_DATABASE_ERROR . $e->getMessage();
+                throw new DatabaseConnectionException($e->getMessage());
             }
         }
-        // default return
-        return false;
     }
 
     /**
      * Search into database for the user data of user_name specified as parameter
-     * @param user_name string
-     * @return mixed data as an object if existing user orif user_name is not found in the database
-     * TODO: @devplanete This returns two different types. Maybe this is valid, but it feels bad. We should rework this.
-     * TODO: @devplanete After some resarch I'm VERY sure that this is not good coding style! Please fix this.
+     * @param $user_name string
+     * @return mixed data as an object if existing user or if user_name is not found in the database
+     * TODO: This returns two different types. Maybe this is valid, but it feels bad. We should rework this.
+     * TODO: After some resarch I'm VERY sure that this is not good coding style! Please fix this.
      */
     private function getUserData($user_name)
     {
@@ -542,7 +542,7 @@ class Login
 
             // if this email exists
             if (isset($result_row->user_id)) {
-                $this->errors[] = MESSAGE_EMAIL_ALREADY_EXISTS;
+                $this->errors[] = L::t("This email address is already registered. Please use the \"I forgot my password\" page if you don't remember it.", "AdminLogin");
             } else {
                 // write users new data into database
                 $query_edit_user_email = $this->db_connection->prepare('UPDATE users SET user_email = :user_email WHERE user_id = :user_id');
@@ -552,9 +552,9 @@ class Login
 
                 if ($query_edit_user_email->rowCount()) {
                     $_SESSION['user_email'] = $user_email;
-                    $this->messages[] = MESSAGE_EMAIL_CHANGED_SUCCESSFULLY . $user_email;
+                    $this->messages[] = L::t("Your email address has been changed successfully. New email address is ", "AdminLogin") . $user_email;
                 } else {
-                    $this->errors[] = MESSAGE_EMAIL_CHANGE_FAILED;
+                    $this->errors[] = L::t("Sorry, your email changing failed.", "AdminLogin");
                 }
             }
         }
@@ -739,7 +739,7 @@ class Login
         $user_name = trim($user_name);
 
         if (empty($user_name) || empty($verification_code)) {
-            $this->errors[] = MESSAGE_LINK_PARAMETER_EMPTY;
+            $this->errors[] = L::t("Empty link parameter data.", "AdminLogin");
         } else {
             // database query, getting all the info of the selected user
             $result_row = $this->getUserData($user_name);

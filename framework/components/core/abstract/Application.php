@@ -220,7 +220,7 @@ abstract class Application extends Router
     }
 
     /**
-     * @param $login mixed | \tree\components\Login;
+     * @param $login mixed | \tree\components\admin\Login;
      */
     public function initLogin($login)
     {
@@ -229,7 +229,7 @@ abstract class Application extends Router
 
 
     /**
-     * @return mixed | \tree\components\Login;
+     * @return mixed | \tree\components\admin\Login;
      */
     public function login()
     {
@@ -237,7 +237,7 @@ abstract class Application extends Router
     }
 
     /**
-     * @param $activity \tree\components\ActivityTracker;
+     * @param $activity \tree\components\admin\ActivityTracker;
      */
     public function initActivityTracker($activity)
     {
@@ -245,7 +245,7 @@ abstract class Application extends Router
     }
 
     /**
-     * @return mixed | \tree\components\ActivityTracker;
+     * @return mixed | \tree\components\admin\ActivityTracker;
      */
     public function activityTracker()
     {
