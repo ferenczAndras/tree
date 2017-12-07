@@ -59,16 +59,16 @@ class ActivePlugins extends Object
 
     }
 
-    public function runAllThePlugins()
+    public function runAllThePluginsBeforeThemeLoad()
     {
 
         foreach ($this->getPluginsIdentifierArray() as $pluginIdentifier):
-            $this->runPlugin($pluginIdentifier);
+            $this->runPluginBeforeThemeLoad($pluginIdentifier);
         endforeach;
 
     }
 
-    public function runPlugin($pluginIdentifier)
+    public function runPluginBeforeThemeLoad($pluginIdentifier)
     {
         try {
             $pluginLoader = CONTENTPATH . "/plugins/" . $pluginIdentifier . "/autoload.php";
@@ -87,16 +87,14 @@ class ActivePlugins extends Object
 
                 $theme = new $pluginClass();
 
-                $theme->run();
+                $theme->runBefore();
 
             } else {
                 throw new PluginLoaderException("Unable to initialize the $pluginIdentifier plugin main class. ");
             }
 
         } catch (\Exception $e) {
-            echo "Message : " . $e->getMessage();
-            echo "Code : " . $e->getCode();
-            die("Unable to load the current theme.\n");
+            throw new PluginLoaderException("Unable to load the current plugin. E: " . $e->getMessage());
         }
     }
 
@@ -123,7 +121,6 @@ class ActivePlugins extends Object
     {
         if (self::$instance === null) {
             self::$instance = new ActivePlugins();
-            return self::$instance;
         }
         return self::$instance;
     }

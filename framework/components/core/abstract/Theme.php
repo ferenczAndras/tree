@@ -5,6 +5,8 @@ namespace tree\core;
 /**
  * No direct access to this file.
  */
+use tree\App;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -12,6 +14,7 @@ if (!defined('ABSPATH')) {
 /**
  * Class      Theme abstract class
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
@@ -20,6 +23,12 @@ if (!defined('ABSPATH')) {
  */
 abstract class Theme extends Object
 {
+
+    public function __construct()
+    {
+        $this->runPluginsBeforeTheme();
+    }
+
     /**
      * @var string used for saving wording in databases
      */
@@ -93,6 +102,16 @@ abstract class Theme extends Object
     public function run()
     {
         throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::run()");
+    }
+
+    public function runPluginsAfterTheme()
+    {
+//        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
+    }
+
+    public function runPluginsBeforeTheme()
+    {
+        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
     }
 
 

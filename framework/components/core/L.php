@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 /**
  * Class      L object for language handling
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
@@ -22,6 +23,8 @@ class L extends Object
 {
 
     private $languageArray = array();
+
+    protected static $instance;
 
     public static function t($message, $package = "TreeFramework")
     {
@@ -52,7 +55,6 @@ class L extends Object
     }
 
 
-    protected static $instance;
 
     public function  __construct()
     {
@@ -66,7 +68,6 @@ class L extends Object
     {
         if (self::$instance === null) {
             self::$instance = new L();
-            return self::$instance;
         }
         return self::$instance;
     }

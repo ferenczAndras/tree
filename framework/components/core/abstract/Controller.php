@@ -4,11 +4,12 @@ namespace tree\core;
 /**
  * No direct access to this file.
  */
+use tree\App;
+
 if (!defined('ABSPATH')) {
     exit;
 }
 
-use tree\helper\UrlUtils;
 
 /**
  * Class      Controller abstract class
@@ -23,38 +24,6 @@ abstract class Controller extends Object
 {
 
     /**
-     * Sets the path to root directory
-     * @param string $dir
-     */
-    public function setDir($dir = "")
-    {
-        $this->dir = $dir;
-    }
-
-    /**
-     * sets the current assets
-     * @param $assets Assets
-     */
-    public function setAssets($assets)
-    {
-        $this->assets = $assets;
-    }
-
-    /**
-     *
-     * Holds the current pages assets class.
-     *
-     * @var Assets;
-     */
-    public $assets;
-
-    /**
-     * The path to the root directory of the project
-     * @var string
-     */
-    public $dir = "";
-
-    /**
      * This field holds the controllers model if there is any.
      * @var
      */
@@ -67,32 +36,12 @@ abstract class Controller extends Object
     public $layout = 'main';
 
     /**
-     * List of layouts available.
-     * @main contains all the basic elements for the site: navbar, header
-     * @empty contains only the body html element tag
-     * @ajax it is an empty file, where the @content variable is shown
-     *
-     * @var array
-     */
-    private $layouts = array("main", "empty", "ajax");
-
-    /**
      * If the value is true, the default views/layouts/footer.php is used to render the basic scripts
      * Else the page or the view needs to contain all the necessary scripts!
      * @var bool
      */
     public $footer = true;
 
-    /**
-     * If any css stylesheet is required by the page to be loaded is puted in this array.
-     * It needs to be overwritten and the files needs to contain the path to file from the
-     * admin folder.
-     *
-     * EXAMPLE:  "assets/css/style.css"
-     *
-     * @var array
-     */
-    public $css = array();
 
     /**
      *  This is a STATIC variable. If the current controller has any views and it needs to be shown in Navigation BAR ( LEFT BAR )
@@ -146,80 +95,77 @@ abstract class Controller extends Object
     public $actions = array("index");
 
     /**
-     * Main entry point, for the Controller. This method is need to be called.
-     * @param string $page first parameter in url site.com/page/action
-     * @param string $action the second parameter afer the site.com/page/action
+     * Main entry point, for the Controller. This method is need to be called to run a controller.
      */
-    public function runAction($page = "", $action = "")
+    public function runAction()
     {
         ob_start();
 
+        $action = App::app()->getAction();
+
         $actionFunction = 'action' . ucfirst($action);
+
 
         //if the action is listed in actions array, we trigger that function
         if (in_array($action, $this->actions)) {
+
             if (method_exists($this, $actionFunction)) {
                 $this->$actionFunction();
+
             } else {
-                self::error('The <strong>"' . $actionFunction . '"</strong> method in <strong>' . get_class($this) . '</strong> dose not exists! Please contact the site maintainer with this issue.', $page);
+
+                self::error('The <strong>"' . $actionFunction . '"</strong> method in <strong>' . get_class($this) . '</strong> dose not exists! ');
+
             }
         } else {
             $this->actionIndex();
         }
+
         $content = ob_get_clean();
 
         $includefooter = $this->footer;
 
-        $assets = $this->assets;
+        $assets = App::app()->theme()->getAssets();
 
-        $error = false;
 
-        if (in_array($this->layout, $this->layouts)) {
+        if (in_array($this->layout, App::app()->theme()->getLayouts())) {
 
             // if layout file exists in app/views/layouts
-            if (file_exists($this->dir . '/views/layouts/' . $this->layout . '.php')) {
+            if (file_exists(App::app()->theme()->getDir() . '/view/layout/' . $this->layout . '.php')) {
 
-                require_once $this->dir . '/views/layouts/' . $this->layout . '.php';
-                // if layout file exists in tree/views/layouts
-            } else if (TREE_DIR . '/layouts/' . $this->layout . '.php') {
-                require_once TREE_DIR . '/views/layouts/' . $this->layout . '.php';
+                require_once App::app()->theme()->getDir() . '/view/layout/' . $this->layout . '.php';
+
             } else {
-                $error = true;
+                self::error("Layout not found!");
             }
         } else {
-            $error = true;
+            self::error("Layout not allowed / not found!");
         }
-        if ($error) {
-            self::error('The ' . $page . " controller has a wrong layout setup! Please contact the site maintainer with this issue.", $page);
 
-        }
     }
 
     /**
      * Shows error page
-     *  $act the action, contains the message
-     *  $page contains the back url
-     * @param $act
-     * @param string $page
+     * @param $act string contains the error message
      */
-    public static function error($act, $page = "Dashboard")
+    public static function error($act)
     {
-        UrlUtils::error($act, $page);
+        throw new ThemeLoaderException($act);
     }
 
     /**
      * Renders the view from views folder
      * First param is the page itself
      * Second param any necessary data to view file
-     * @param $page
-     * @param null $param
+     * @param $file string
+     * @param $param mixed
      */
-    public function renderView($page, $param = NULl)
+    public function renderView($file, $param = NULl)
     {
-        if (file_exists($this->dir . '/views/' . $page . '.php')) {
-            require_once $this->dir . '/views/' . $page . '.php';
+        if (file_exists(App::app()->theme()->getDir() . '/view/' . $file . '.php')) {
+            require_once App::app()->theme()->getDir() . '/view/' . $file . '.php';
         } else {
-            self::error('The <strong>"' . $page . '"</strong> view in ' . get_class($this) . ' dose not exists! Please contact the site maintainer with this issue.', $page);
+            self::error('The <strong>"' . $file . '"</strong> view in ' . get_class($this) . ' dose not exists! ');
         }
     }
 
@@ -229,6 +175,7 @@ abstract class Controller extends Object
      */
     public function actionIndex()
     {
+        throw new UnImplementedMethodException("actionIndex() is not implementd");
     }
 
     /**
@@ -300,7 +247,7 @@ abstract class Controller extends Object
      * If the controller has no info Widget you have to do absolutely nothing.
      * Else please follow the structure of the info widget:
      *
-     * @type is static, is not needed to be changed.
+     * @type string is static, is not needed to be changed.
      * @title first line of the widget
      * @subtitle second line of the widget
      * @color ONLY the name of the color. See the Documentation for available colors!
@@ -339,7 +286,7 @@ abstract class Controller extends Object
      * Static function which returns all the necessary data for showing the settings field in the settings / controller section
      *
      * Basically it is a simple return function, which returns the name and keys.
-     * @name String the name of the controller.
+     * @name string | mixed the name of the controller.
      * @keys a big array, contains all the necessary data. In order to know how a key looks like, we explain detailed every supported one below.
      *
      * public static function getSettings(){

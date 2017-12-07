@@ -32,11 +32,9 @@ if (defined('ADMINPATH')):
 
     require_once __DIR__ . '/admin/Admin.php';
 
-
     require_once __DIR__ . '/filemanager/FileManager.php';
 
 endif;
-
 
 require_once __DIR__ . '/pluginmanager/PluginManager.php';
 

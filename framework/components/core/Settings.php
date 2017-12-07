@@ -12,16 +12,15 @@ if (!defined('ABSPATH')) {
 /**
  * Defines the SETTING TABLE NAME
  */
-
 if (!defined("TREE_SETTINGS"))
     define("TREE_SETTINGS", "tree_settings");
-
 
 use tree\App as App;
 
 /**
  * Class      Settings class
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License

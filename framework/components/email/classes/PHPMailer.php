@@ -1,27 +1,27 @@
 <?php
-    /*~ class.phpmailer.php
-    .---------------------------------------------------------------------------.
-    |  Software: PHPMailer - PHP email class                                    |
-    |   Version: 5.2.6                                                          |
-    |      Site: https://github.com/PHPMailer/PHPMailer/                        |
-    | ------------------------------------------------------------------------- |
-    |    Admins: Marcus Bointon                                                 |
-    |    Admins: Jim Jagielski                                                  |
-    |   Authors: Andy Prevost (codeworxtech) codeworxtech@users.sourceforge.net |
-    |          : Marcus Bointon (coolbru) phpmailer@synchromedia.co.uk          |
-    |          : Jim Jagielski (jimjag) jimjag@gmail.com                        |
-    |   Founder: Brent R. Matzelle (original founder)                           |
-    | Copyright (c) 2010-2012, Jim Jagielski. All Rights Reserved.              |
-    | Copyright (c) 2004-2009, Andy Prevost. All Rights Reserved.               |
-    | Copyright (c) 2001-2003, Brent R. Matzelle                                |
-    | ------------------------------------------------------------------------- |
-    |   License: Distributed under the Lesser General Public License (LGPL)     |
-    |            http://www.gnu.org/copyleft/lesser.html                        |
-    | This program is distributed in the hope that it will be useful - WITHOUT  |
-    | ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     |
-    | FITNESS FOR A PARTICULAR PURPOSE.                                         |
-    '---------------------------------------------------------------------------'
-    */
+/*~ class.phpmailer.php
+.---------------------------------------------------------------------------.
+|  Software: PHPMailer - PHP email class                                    |
+|   Version: 5.2.6                                                          |
+|      Site: https://github.com/PHPMailer/PHPMailer/                        |
+| ------------------------------------------------------------------------- |
+|    Admins: Marcus Bointon                                                 |
+|    Admins: Jim Jagielski                                                  |
+|   Authors: Andy Prevost (codeworxtech) codeworxtech@users.sourceforge.net |
+|          : Marcus Bointon (coolbru) phpmailer@synchromedia.co.uk          |
+|          : Jim Jagielski (jimjag) jimjag@gmail.com                        |
+|   Founder: Brent R. Matzelle (original founder)                           |
+| Copyright (c) 2010-2012, Jim Jagielski. All Rights Reserved.              |
+| Copyright (c) 2004-2009, Andy Prevost. All Rights Reserved.               |
+| Copyright (c) 2001-2003, Brent R. Matzelle                                |
+| ------------------------------------------------------------------------- |
+|   License: Distributed under the Lesser General Public License (LGPL)     |
+|            http://www.gnu.org/copyleft/lesser.html                        |
+| This program is distributed in the hope that it will be useful - WITHOUT  |
+| ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     |
+| FITNESS FOR A PARTICULAR PURPOSE.                                         |
+'---------------------------------------------------------------------------'
+*/
 
 /**
  * PHPMailer - PHP email creation and transport class
@@ -588,12 +588,12 @@ class PHPMailer
 
     /**
      * Sets message type to HTML.
-     * @param bool $ishtml
+     * @param bool $isHtml
      * @return void
      */
-    public function IsHTML($ishtml = true)
+    public function IsHTML($isHtml = true)
     {
-        if ($ishtml) {
+        if ($isHtml) {
             $this->ContentType = 'text/html';
         } else {
             $this->ContentType = 'text/plain';

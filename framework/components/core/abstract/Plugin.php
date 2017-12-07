@@ -15,6 +15,7 @@ use tree\App as App;
 /**
  * Class      Plugin abstract class
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
@@ -70,10 +71,10 @@ class Plugin extends Object
     /**
      *
      */
-    public function run()
+    public function runBefore()
     {
         if (App::app()->type() === App::$APP_THEME)
-            $this->runTheme();
+            $this->runBeforeTheme();
         else if (App::app()->type() === App::$APP_ADMIN)
             $this->runAdmin();
     }
@@ -81,9 +82,17 @@ class Plugin extends Object
     /**
      *
      */
-    protected function runTheme()
+    protected function runBeforeTheme()
     {
-        throw new UnImplementedMethodException("runTheme() must be implemented in the plugin");
+        throw new UnImplementedMethodException("runBeforeTheme() must be implemented in the plugin");
+    }
+
+    /**
+     *
+     */
+    protected function runAfterTheme()
+    {
+        throw new UnImplementedMethodException("runAfterTheme() must be implemented in the plugin");
     }
 
     /**

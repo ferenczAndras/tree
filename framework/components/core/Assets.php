@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
 /**
  * Class      Assets class for the website head template
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License

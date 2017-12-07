@@ -200,16 +200,17 @@ class Registration extends Object
         }
     }
 
-
-    /*
+    /**
      * sends an email to the provided email address
-     * @return boolean gives back true if mail has been sent, gives back false if no mail could been sent
+     * @param $user_id int
+     * @param $user_email string
+     * @param $user_activation_hash string
+     * @return bool true if the email was sent successfully
+     * @throws \phpmailerException if something is going wrong
      */
-
-    public
-    function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
+    public function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
     {
-        $mail = new PHPMailer;
+        $mail = new PHPMailer();
 
         if (EMAIL_USE_SMTP) {
             // Set mailer to use SMTP
@@ -238,7 +239,6 @@ class Registration extends Object
 
         $link = App::getUrl(App::app()->adminFolder()) . '?id=' . urlencode($user_id) . '&verification_code=' . urlencode($user_activation_hash);
 
-
         $body = new HtmlEmailBodyGenerator();
 
         $mail->Body = $body->setType(HtmlEmailBodyGenerator::$TYPE_CLICK_HERE)
@@ -252,7 +252,7 @@ class Registration extends Object
 
 
         if (!$mail->Send()) {
-            $this->errors[] = L::t("Verification Mail NOT successfully sent! Error: ", "AdminRegistration") . $mail->ErrorInfo;
+            $this->errors[] = L::t("Verification Mail was not successfully sent! Error: ", "AdminRegistration") . $mail->ErrorInfo;
             return false;
         } else {
             return true;
