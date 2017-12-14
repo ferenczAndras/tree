@@ -21,7 +21,15 @@ require_once __DIR__ . '/DatabaseModel.php';
 require_once __DIR__ . '/BaseModel.php';
 require_once __DIR__ . '/Controller.php';
 require_once __DIR__ . '/AdminController.php';
+require_once __DIR__ . '/PluginController.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Application.php';
 require_once __DIR__ . '/Plugin.php';
 require_once __DIR__ . '/Theme.php';
+require_once __DIR__ . '/Email.php';
+
+if (defined('ADMINPATH')):
+
+    require_once __DIR__ . '/Installer.php';
+
+endif;

@@ -24,11 +24,6 @@ if (!defined('ABSPATH')) {
 abstract class Theme extends Object
 {
 
-    public function __construct()
-    {
-        $this->runPluginsBeforeTheme();
-    }
-
     /**
      * @var string used for saving wording in databases
      */
@@ -51,6 +46,10 @@ abstract class Theme extends Object
      */
     protected $dir;
 
+    /**
+     * @var bool if this variable is set to false, the theme is not going to run it's own controller but a controller;
+     */
+    protected $runControllerAfterPlugin;
 
     /**
      * List of layouts available.
@@ -61,6 +60,32 @@ abstract class Theme extends Object
      * @var array
      */
     protected $layouts = array("main", "empty", "ajax");
+
+    /**
+     * Theme constructor.
+     */
+    public function __construct()
+    {
+        $this->updateRunControllerAfterPlugin(true);
+    }
+
+    public function updateRunControllerAfterPlugin($run = true)
+    {
+        $this->runControllerAfterPlugin = $run;
+    }
+
+    public function runThemeControllerAfterPlugin()
+    {
+        return $this->runControllerAfterPlugin;
+    }
+
+    /**
+     * @param $dir string the current theme base directory path
+     */
+    public function setDir($dir)
+    {
+        $this->dir = $dir;
+    }
 
     /**
      * Returns the current theme base directory path
@@ -96,19 +121,46 @@ abstract class Theme extends Object
         return $this->layouts;
     }
 
+
+    /**
+     * Main run method which handles all the plugin controllers and the theme controllers
+     */
+    public function run()
+    {
+
+        if (App::app()->type() === App::$APP_THEME) {
+            $this->runPluginsBeforeTheme();
+        }
+
+        if ($this->runThemeControllerAfterPlugin()) {
+            $this->runController();
+        }
+
+        if (App::app()->type() === App::$APP_THEME) {
+            $this->runPluginsAfterTheme();
+        }
+    }
+
+
     /**
      * Default run method for any theme main class
      */
-    public function run()
+    public function runController()
     {
         throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::run()");
     }
 
+    /**
+     *
+     */
     public function runPluginsAfterTheme()
     {
 //        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
     }
 
+    /**
+     *
+     */
     public function runPluginsBeforeTheme()
     {
         App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();

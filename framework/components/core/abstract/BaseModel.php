@@ -9,32 +9,138 @@ if (!defined('ABSPATH')) {
 }
 
 use Exception;
+use tree\App;
 
 /**
  * Class      BaseModel abstract class
  * @category  Core Components
+ * @since     1.0.0
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-abstract class BaseModel extends Object
+abstract class BaseModel extends DatabaseModel
 {
 
+    protected $secretKey = "CHANGE_THIS_TO_A_SECRET_KEY";
 
-    public $messages = array();
+    protected $secretKeyIdentifier = "sec";
 
-    public $errors = array();
+    protected static $_instance = null;
 
-    function __construct()
+    protected $errors = array();
+
+    /**
+     * @return BaseModel | mixed
+     */
+    public static function getInstance()
     {
+        $className = self::className();
+
+        if (self::$_instance == null) {
+            self::$_instance = new $className();
+        }
+        return self::$_instance;
     }
 
-    public function addMessage($mess)
+    /**
+     * @return string the secret key for FORM post and get actions in a base64 form
+     */
+    public function getSecretKey()
     {
-        $this->messages[] = $mess;
+        return base64_encode($this->secretKey);
     }
+
+    /**
+     * @param $secKey string Initialize the model secret key for FORM post and Get actions
+     */
+    public function initSecretKey($secKey)
+    {
+        $this->secretKey = $secKey;
+    }
+
+    /**
+     * @param $key string the key we try to validate
+     * @return bool the answear
+     */
+    public function validateSecretKey($key)
+    {
+        return base64_decode($key) == $this->secretKey;
+    }
+
+    /**
+     * @return bool Checks if the current form post contains the correct security key
+     */
+    protected function handleSecurityFormPost()
+    {
+        if (isset($_POST[$this->secretKeyIdentifier]) == false) {
+            return false;
+        }
+        return $this->validateSecretKey($_POST[$this->secretKeyIdentifier]);
+    }
+
+    /**
+     * @return bool Checks if the current form get contains the correct security key
+     */
+    protected function handleSecurityFormGet()
+    {
+        if (isset($_GET[$this->secretKeyIdentifier]) == false) {
+            return false;
+        }
+        return $this->validateSecretKey($_GET[$this->secretKeyIdentifier]);
+    }
+
+
+    protected function saveActivity($what = array(), $type = "GENERAL")
+    {
+        if (App::app()->type() === App::$APP_ADMIN && App::app()->activityTracker() != NULL):
+            if (isset($what['message']) && isset($what['getter']) && isset($what['objectId']) && isset($what['url'])) :
+
+                switch ($type):
+
+                    case "NEW":
+                    case "new":
+                        App::app()->activityTracker()->newEditActivity($what['message'], $what['getter'], $what['objectId'], $what['url']);
+                        break;
+                    default:
+
+                        break;
+                endswitch;
+            endif;
+        endif;
+
+    }
+
+
+    /**
+     * TODO: Get rid of this method
+     * Generates a string from the name array of the model
+     * @param $titles
+     * @return string
+     */
+    public function generateName($titles)
+    {
+        $title = "";
+        foreach ($titles as $t):
+            if (strlen($t) > 0)
+                $title = $t . " - " . $title;
+        endforeach;
+        return $title;
+    }
+
+
+
+
+
+
+    /*
+     *
+     * TODO: Reconfigure the hole validation system.
+     *
+     */
+
 
     /*
      * Rules for validation
@@ -95,12 +201,6 @@ abstract class BaseModel extends Object
                                 if (strlen($array[$attribute]) > $max) {
                                     $this->errors[] = isset($ruleitem['error']) ? $ruleitem['error'] : "Something went wrong. (005)";
                                 }
-                            }
-                            break;
-                        case 'exists':
-                            $obj = new $ruleitem['class'];
-                            if (!$obj->exists($array[$attribute])) {
-                                $this->errors[] = isset($ruleitem['error']) ? $ruleitem['error'] : "Something went wrong. (006)";
                             }
                             break;
 
@@ -169,12 +269,6 @@ abstract class BaseModel extends Object
                                 }
                             }
                             break;
-                        case 'exists':
-                            $obj = new $ruleitem['class'];
-                            if (!$obj->exists($this->$attribute)) {
-                                $this->errors[] = isset($ruleitem['error']) ? $ruleitem['error'] : "Something went wrong. (006)";
-                            }
-                            break;
 
                         default:
                             throw new \Exception('Rule "' . $ruleitem['rule'] . '" is not declared in code.');
@@ -184,30 +278,5 @@ abstract class BaseModel extends Object
             }
         }
         return empty($this->errors);
-    }
-
-    /*
-     * Method for checking if something exists
-     * Must be overwritten !
-     */
-    public function exists($value)
-    {
-        return false;
-    }
-
-
-    /**
-     * Generates a string from the name array of the model
-     * @param $titles
-     * @return string
-     */
-    public function generateName($titles)
-    {
-        $title = "";
-        foreach ($titles as $t):
-            if (strlen($t) > 0)
-                $title = $t . " - " . $title;
-        endforeach;
-        return $title;
     }
 }

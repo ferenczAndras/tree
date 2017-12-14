@@ -102,13 +102,12 @@ class Login extends Object
     /**
      * the function "__construct()" automatically starts whenever an object of this class is created,
      * you know, when you do "$login = new Login();"
-     * @param null $tracker
      * @param bool $trackActivity
      */
-    public function __construct($tracker = null, $trackActivity = false)
+    public function __construct($trackActivity = false)
     {
         $this->trackactivity = $trackActivity;
-        $this->activityTracker = $tracker;
+        $this->activityTracker = null;
 
         // create/read session
         if (!isset($_SESSION)) {

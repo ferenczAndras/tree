@@ -155,8 +155,10 @@ class ActivityTracker extends DatabaseModel
     }
 
 
-    public function newEditActivity($userName, $objectName, $getterParam, $objectId, $url)
+    public function newEditActivity($objectName, $getterParam, $objectId, $url)
     {
+
+        $userName = App::app()->get("login")->getUsername();
 
         $a = [
             "userName" => $userName,

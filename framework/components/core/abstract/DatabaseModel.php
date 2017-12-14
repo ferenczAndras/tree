@@ -69,8 +69,8 @@ abstract class DatabaseModel extends Object
     }
 
     /**
-     * @param $key
-     * @param null $defaultValue
+     * @param $key string
+     * @param null $defaultValue string
      */
     public function get($key, $defaultValue = null)
     {
@@ -78,8 +78,8 @@ abstract class DatabaseModel extends Object
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param $key string
+     * @param $value string
      */
     public function insert($key, $value)
     {
@@ -99,6 +99,14 @@ abstract class DatabaseModel extends Object
     public function install()
     {
         throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::install()");
+    }
+
+    /**
+     * @return array of the sql scripts in string format
+     */
+    public function tableInstallerScripts()
+    {
+        return array();
     }
 
 }

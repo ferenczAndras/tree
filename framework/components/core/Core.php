@@ -23,3 +23,9 @@ require_once __DIR__ . '/Meta.php';
 require_once __DIR__ . '/Assets.php';
 require_once __DIR__ . '/Settings.php';
 require_once __DIR__ . '/Sessions.php';
+
+if (defined('ADMINPATH')):
+
+    require_once __DIR__ . '/PluginInstaller.php';
+
+endif;

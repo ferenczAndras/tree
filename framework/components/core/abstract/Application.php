@@ -22,6 +22,15 @@ use tree\database\MySqlDatabase;
  */
 abstract class Application extends Router
 {
+
+    /**
+     * Current version
+     *
+     * @var string
+     */
+    const VERSION = '1.0.0-dev';
+
+
     /**
      * This field holds the initialized class. It can be get via:
      *  Application::app()
@@ -178,6 +187,7 @@ abstract class Application extends Router
         $this->add("language", $languageHandler);
     }
 
+
     /**
      * Get's the current language handler method
      * @return mixed | \tree\core\L
@@ -187,6 +197,7 @@ abstract class Application extends Router
         return $this->get("language");
     }
 
+
     /**
      * @param $pluginsManager \tree\pluginmanager\ActivePlugins
      */
@@ -194,6 +205,7 @@ abstract class Application extends Router
     {
         $this->add("activePlugins", $pluginsManager);
     }
+
 
     /**
      * @return null | \tree\pluginmanager\ActivePlugins
@@ -203,6 +215,7 @@ abstract class Application extends Router
         return $this->get("activePlugins");
     }
 
+
     /**
      * @param $settings \tree\core\Settings | \admin\components\AdminSettings;
      */
@@ -210,6 +223,7 @@ abstract class Application extends Router
     {
         $this->add("settings", $settings);
     }
+
 
     /**
      * @return \tree\core\Settings | \admin\components\AdminSettings;
@@ -235,6 +249,25 @@ abstract class Application extends Router
     {
         return $this->get("userLogin");
     }
+
+
+    /**
+     * @param $email mixed | \tree\core\Email
+     */
+    public function initEmail($email)
+    {
+        $this->add("email", $email);
+    }
+
+
+    /**
+     * @return mixed | \tree\core\Email
+     */
+    public function email()
+    {
+        return $this->get("email");
+    }
+
 
     /**
      * @param $activity \tree\components\admin\ActivityTracker;

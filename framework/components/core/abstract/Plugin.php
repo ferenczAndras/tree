@@ -25,6 +25,11 @@ use tree\App as App;
 class Plugin extends Object
 {
     /**
+     * @var null | string this variable holds the current plugin identifier string. It must be overwritten
+     */
+    public static $IDENTIFIER = "";
+
+    /**
      * @var string used to get the active theme settings
      */
     public static $ACTIVE_PLUGINS_SETTINGS_KEY = "activePlugins";
@@ -33,13 +38,55 @@ class Plugin extends Object
      * Holds the current theme base directory path
      * @var String
      */
-    public $dir;
+    protected $dir;
 
     /**
      * Holds the current theme assets component
      * @var \tree\core\Assets;
      */
     public $assets;
+
+    /**
+     * @var Plugin | mixed
+     */
+    protected static $_instance = null;
+
+    /**
+     * @param $instance Plugin
+     */
+    public static function initPlugin($instance)
+    {
+        self::$_instance = $instance;
+    }
+
+    /**
+     * @return Plugin | mixed
+     */
+    private static function getInstance()
+    {
+        $className = self::className();
+
+        if (self::$_instance == null) {
+            self::$_instance = new $className();
+        }
+        return self::$_instance;
+    }
+
+    /**
+     * @return mixed|Plugin
+     */
+    public static function plugin()
+    {
+        return self::getInstance();
+    }
+
+    /**
+     * @param $dir string currernt plugin directory
+     */
+    public function setDir($dir)
+    {
+        $this->dir = $dir;
+    }
 
     /**
      * Returns the current theme base directory path
@@ -68,9 +115,6 @@ class Plugin extends Object
     }
 
 
-    /**
-     *
-     */
     public function runBefore()
     {
         if (App::app()->type() === App::$APP_THEME)
@@ -80,6 +124,8 @@ class Plugin extends Object
     }
 
     /**
+     *   This method is the one, where the plugin can do it's own magic.
+     * It can run it's own Controller, or initialize all the necessary stufs for the theme
      *
      */
     protected function runBeforeTheme()
@@ -101,5 +147,13 @@ class Plugin extends Object
     protected function runAdmin()
     {
         throw new UnImplementedMethodException("runAdmin() must be implemented in the plugin");
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminNavigationBar()
+    {
+        return array();
     }
 }
