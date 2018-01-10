@@ -28,8 +28,15 @@ abstract class Application extends Router
      *
      * @var string
      */
-    const VERSION = '1.0.0-dev';
+    const VERSION = '1.0.0';
 
+    /**
+     * Current channel to use for core updates
+     * @value stable | dev
+     *
+     * @var string
+     */
+    const CHANNEL = "dev";
 
     /**
      * This field holds the initialized class. It can be get via:

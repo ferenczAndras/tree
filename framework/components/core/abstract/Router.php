@@ -123,7 +123,6 @@ class Router extends Object
 
     public static function error($act, $page = "Dashboard")
     {
-
         self::redirectInSite('systemerror?action=' . $act . "&backurl=" . $page, true);
     }
 
@@ -136,7 +135,6 @@ class Router extends Object
         $baseUrl = self::getRequestScheme() . "://" . $_SERVER['SERVER_NAME'] . "/" . FRAMEWORK_URL . "/";//. str_replace("index.php", "", $_SERVER['SCRIPT_NAME']);
         return $baseUrl . $what;
 
-
     }
 
     public static function getRequestScheme()
@@ -146,5 +144,24 @@ class Router extends Object
         return "http";
     }
 
+    public static function getPluginTagUrl($tag)
+    {
+        return "http://treeframework.affarit.com/plugins/" . $tag;
+    }
+
+    public static function getDeveloperUrl($developer)
+    {
+        return "http://treeframework.affarit.com/developer/" . $developer;
+    }
+
+    public static function getReleasesVersionsUrl($channel)
+    {
+        return "http://treeframework.affarit.com/releases/current-release-$channel-versions.php";
+    }
+
+    public static function getReleasePackageUrl($version, $channel)
+    {
+        return 'http://treeframework.affarit.com/releases/TREE-' . $version . '-' . $channel . '.zip';
+    }
 
 }

@@ -24,6 +24,14 @@ use tree\App as App;
  */
 class Plugin extends Object
 {
+
+    /**
+     * Current plugin version
+     *
+     * @var string
+     */
+    const VERSION = 'unknown';
+
     /**
      * @var null | string this variable holds the current plugin identifier string. It must be overwritten
      */
@@ -152,8 +160,31 @@ class Plugin extends Object
     /**
      * @return array
      */
-    public function getAdminNavigationBar()
+    public static function adminNavigationBar()
     {
         return array();
     }
+
+    /**
+     * @return array [
+     *
+     *  "name" =>"plugin_name",
+     *  "description" =>"",
+     *  "identifier" => "identifier",
+     *  "adminUrl" => "base_admin_url_page",
+     *  "developer" => "developer name",
+     *  "developerIdentifier" =>"developerIdentifier",
+     *  "pluginUrl" => "plugin_url",
+     *  "version" => "",
+     *  "tags" => ["tag1","tag2"]
+     *
+     * ]
+     *
+     */
+    public static function adminConfig()
+    {
+        return array();
+    }
+
+
 }

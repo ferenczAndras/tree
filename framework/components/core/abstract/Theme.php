@@ -21,8 +21,15 @@ if (!defined('ABSPATH')) {
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-abstract class Theme extends Object
+abstract class Theme extends ThemeHook
 {
+
+    /**
+     * Current plugin version
+     *
+     * @var string
+     */
+    const VERSION = 'unknown';
 
     /**
      * @var string used for saving wording in databases
@@ -38,7 +45,7 @@ abstract class Theme extends Object
      * Holds the current theme assets component
      * @var \tree\core\Assets;
      */
-    protected $assets;
+    private $assets;
 
     /**
      * Holds the current theme base directory path
@@ -148,22 +155,6 @@ abstract class Theme extends Object
     public function runController()
     {
         throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::run()");
-    }
-
-    /**
-     *
-     */
-    public function runPluginsAfterTheme()
-    {
-//        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
-    }
-
-    /**
-     *
-     */
-    public function runPluginsBeforeTheme()
-    {
-        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
     }
 
 

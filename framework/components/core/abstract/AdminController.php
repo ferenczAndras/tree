@@ -62,9 +62,12 @@ abstract class AdminController extends Controller
      *          ITEM 1
      *          ITEM 2
      *
-     * @var array
+     * @return array
      */
-    public static $navbar = [];
+    public function getAdminNavigationBar()
+    {
+        return array();
+    }
 
 
     /**

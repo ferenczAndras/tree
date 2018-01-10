@@ -34,11 +34,10 @@ class App extends Application
         $this->initAppType($type);
         $this->initMySqlDatabase();
         $this->initLanguage(new L());
+        $this->initActivePlugins(new ActivePlugins());
 
         if ($type === Application::$APP_THEME) {
-
             $this->initSettings(new Settings());
-            $this->initActivePlugins(new ActivePlugins());
 
         } else {
             $this->initSettings(new AdminSettings());

@@ -27,6 +27,7 @@ if (!defined('ABSPATH')) {
  */
 class ActivePlugins extends Object
 {
+
     /**
      * @var ActivePlugins
      */
@@ -38,10 +39,24 @@ class ActivePlugins extends Object
     private $pluginIdentifiers;
 
     /**
-     * ActivePlugins constructor.
+     * @var array list of the active plugin classes
      */
-    public function __construct()
+    private $pluginClasses;
+
+    /**
+     * @var boolean holds if the plugins were loaded or not
+     */
+    private $loaded = false;
+
+    /**
+     * ActivePlugins constructor.
+     * @param bool $load do we want to load the identifiers at construct
+     */
+    public function __construct($load = false)
     {
+        if ($load) {
+            $this->load();
+        }
         self::$instance = $this;
     }
 
@@ -53,9 +68,14 @@ class ActivePlugins extends Object
 
         $activePluginsIdentifier = json_decode($activePluginsIdentifier);
 
-        foreach ($activePluginsIdentifier as $a) {
-            $this->addPluginIdentifier($a);
+        foreach ($activePluginsIdentifier as $identifier) {
+            $this->addPluginIdentifier($identifier);
+            $class = ucfirst($identifier);
+            $this->addPluginClass("plugin\\$identifier" . "\\$class");
+
         }
+
+        $this->loaded = true;
 
     }
 
@@ -71,23 +91,14 @@ class ActivePlugins extends Object
     public function runPluginBeforeThemeLoad($pluginIdentifier)
     {
         try {
-            $pluginLoader = CONTENTPATH . "/plugins/" . $pluginIdentifier . "/autoload.php";
 
-            if (!file_exists($pluginLoader)) {
-                throw new PluginLoaderException ("Unable to load the $pluginIdentifier plugin.");
-            } else {
-                require_once $pluginLoader;
-            }
-
-            $class = ucfirst($pluginIdentifier);
-
-            $pluginClass = "plugin\\$pluginIdentifier" . "\\$class";
+            $pluginClass = $this->loadAndRequireOncePlugin($pluginIdentifier);
 
             if (class_exists($pluginClass)) {
 
-                $theme = new $pluginClass();
+                $plugin = new $pluginClass();
 
-                $theme->runBefore();
+                $plugin->runBefore();
 
             } else {
                 throw new PluginLoaderException("Unable to initialize the $pluginIdentifier plugin main class. ");
@@ -99,6 +110,28 @@ class ActivePlugins extends Object
     }
 
     /**
+     * @param $pluginIdentifier string the plugin which we want to load into system
+     * @return string the plugin main class with full namespace
+     * @throws PluginLoaderException
+     */
+    public function loadAndRequireOncePlugin($pluginIdentifier)
+    {
+        $pluginLoader = ABSPATH . DIRECTORY_SEPARATOR . CONTENT . DIRECTORY_SEPARATOR . PLUGINS . DIRECTORY_SEPARATOR . $pluginIdentifier . DIRECTORY_SEPARATOR . "autoload.php";
+
+        if (!file_exists($pluginLoader)) {
+            throw new PluginLoaderException ("Unable to load the $pluginLoader file.");
+        } else {
+            require_once $pluginLoader;
+        }
+
+        $class = ucfirst($pluginIdentifier);
+
+        $pluginClass = "plugin\\$pluginIdentifier" . "\\$class";
+
+        return $pluginClass;
+    }
+
+    /**
      * @param $identity String
      */
     public function addPluginIdentifier($identity)
@@ -106,11 +139,27 @@ class ActivePlugins extends Object
         $this->pluginIdentifiers[] = $identity;
     }
 
+    public function addPluginClass($class)
+    {
+        $this->pluginClasses[] = $class;
+    }
+
+    public function getPluginClasses()
+    {
+        if ($this->loaded === false) {
+            $this->load();
+        }
+        return $this->pluginClasses;
+    }
+
     /**
      * @return array
      */
     public function getPluginsIdentifierArray()
     {
+        if ($this->loaded === false) {
+            $this->load();
+        }
         return $this->pluginIdentifiers;
     }
 

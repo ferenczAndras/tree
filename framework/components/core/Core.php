@@ -27,5 +27,5 @@ require_once __DIR__ . '/Sessions.php';
 if (defined('ADMINPATH')):
 
     require_once __DIR__ . '/PluginInstaller.php';
-
+    require_once __DIR__ . '/CoreUpdater.php';
 endif;

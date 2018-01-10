@@ -18,7 +18,15 @@ if (!defined('ABSPATH')) {
 
 define("TREEDIR", __DIR__);
 
-define("CONTENTPATH", ABSPATH . "/content");
+define("CONTENT", "content");
+
+define("UPDATES", "updates");
+
+define("PLUGINS", "plugins");
+
+define("CONTENTPATH", ABSPATH . DIRECTORY_SEPARATOR . CONTENT);
+
+define("UPDATESPATH", ABSPATH . DIRECTORY_SEPARATOR . CONTENT . DIRECTORY_SEPARATOR . UPDATES . DIRECTORY_SEPARATOR);
 
 define("TREEURL", "http://treeframework.affarit.com");
 
