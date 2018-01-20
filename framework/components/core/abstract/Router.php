@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class Router extends Object
+abstract class Router extends Object
 {
     /**
      * Holds the current page slug

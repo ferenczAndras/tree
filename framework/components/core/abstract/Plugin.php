@@ -10,8 +10,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use tree\App as App;
-
 /**
  * Class      Plugin abstract class
  * @category  Core Components
@@ -22,7 +20,7 @@ use tree\App as App;
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class Plugin extends Object
+abstract class Plugin extends PluginHook
 {
 
     /**
@@ -120,41 +118,6 @@ class Plugin extends Object
     public function getAssets()
     {
         return $this->assets;
-    }
-
-
-    public function runBefore()
-    {
-        if (App::app()->type() === App::$APP_THEME)
-            $this->runBeforeTheme();
-        else if (App::app()->type() === App::$APP_ADMIN)
-            $this->runAdmin();
-    }
-
-    /**
-     *   This method is the one, where the plugin can do it's own magic.
-     * It can run it's own Controller, or initialize all the necessary stufs for the theme
-     *
-     */
-    protected function runBeforeTheme()
-    {
-        throw new UnImplementedMethodException("runBeforeTheme() must be implemented in the plugin");
-    }
-
-    /**
-     *
-     */
-    protected function runAfterTheme()
-    {
-        throw new UnImplementedMethodException("runAfterTheme() must be implemented in the plugin");
-    }
-
-    /**
-     *
-     */
-    protected function runAdmin()
-    {
-        throw new UnImplementedMethodException("runAdmin() must be implemented in the plugin");
     }
 
     /**

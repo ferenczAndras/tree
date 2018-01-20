@@ -21,8 +21,25 @@ if (!defined('ABSPATH')) {
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class ThemeHook extends Object
+abstract class ThemeHook extends Object
 {
+
+    /**
+     *
+     */
+    public function runPluginsAfterAdminTheme()
+    {
+//        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
+    }
+
+    /**
+     *
+     */
+    public function runPluginsBeforeAdminTheme()
+    {
+        App::app()->activePlugins()->runAllThePluginsBeforeThemeLoad();
+    }
+
 
     /**
      *

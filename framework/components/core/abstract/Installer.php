@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
  */
-class Installer extends DatabaseModel
+abstract class Installer extends DatabaseModel
 {
     /**
      * @var array holds all the sql scripts that needs to be installed

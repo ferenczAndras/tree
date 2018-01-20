@@ -73,10 +73,10 @@ abstract class Theme extends ThemeHook
      */
     public function __construct()
     {
-        $this->updateRunControllerAfterPlugin(true);
+        $this->updateRunThemeAfterPlugin(true);
     }
 
-    public function updateRunControllerAfterPlugin($run = true)
+    public function updateRunThemeAfterPlugin($run = true)
     {
         $this->runControllerAfterPlugin = $run;
     }
@@ -139,12 +139,20 @@ abstract class Theme extends ThemeHook
             $this->runPluginsBeforeTheme();
         }
 
+        if (App::app()->type() === App::$APP_ADMIN) {
+            $this->runPluginsBeforeAdminTheme();
+        }
+
         if ($this->runThemeControllerAfterPlugin()) {
-            $this->runController();
+            $this->runTheme();
         }
 
         if (App::app()->type() === App::$APP_THEME) {
             $this->runPluginsAfterTheme();
+        }
+
+        if (App::app()->type() === App::$APP_ADMIN) {
+            $this->runPluginsAfterAdminTheme();
         }
     }
 
@@ -152,9 +160,9 @@ abstract class Theme extends ThemeHook
     /**
      * Default run method for any theme main class
      */
-    public function runController()
+    public function runTheme()
     {
-        throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::run()");
+        throw new UnImplementedMethodException('Calling un implemented method: ' . get_class($this) . "::runTheme()");
     }
 
 

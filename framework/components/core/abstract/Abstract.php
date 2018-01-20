@@ -25,6 +25,7 @@ require_once __DIR__ . '/PluginController.php';
 require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/Application.php';
 require_once __DIR__ . '/Hook.php';
+require_once __DIR__ . '/PluginHook.php';
 require_once __DIR__ . '/Plugin.php';
 require_once __DIR__ . '/ThemeHook.php';
 require_once __DIR__ . '/Theme.php';

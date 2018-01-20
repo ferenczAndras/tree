@@ -60,7 +60,7 @@ class ActivePlugins extends Object
         self::$instance = $this;
     }
 
-    public function load()
+    public function load($require = false)
     {
         $activePluginsIdentifier = App::app()->settings()->get(Plugin::$ACTIVE_PLUGINS_SETTINGS_KEY);
 
@@ -70,6 +70,10 @@ class ActivePlugins extends Object
 
         foreach ($activePluginsIdentifier as $identifier) {
             $this->addPluginIdentifier($identifier);
+
+            if ($require == true)
+                $this->loadAndRequireOncePlugin($identifier);
+
             $class = ucfirst($identifier);
             $this->addPluginClass("plugin\\$identifier" . "\\$class");
 
@@ -144,10 +148,10 @@ class ActivePlugins extends Object
         $this->pluginClasses[] = $class;
     }
 
-    public function getPluginClasses()
+    public function getPluginClasses($require = false)
     {
         if ($this->loaded === false) {
-            $this->load();
+            $this->load($require);
         }
         return $this->pluginClasses;
     }
