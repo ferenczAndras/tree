@@ -50,6 +50,9 @@ abstract class ThemeHook extends Object
     }
 
     /**
+     *  If the theme supports the plugins, than this method is called before the actual theme is constructed
+     *
+     * If there is a theme that dose not supports or dose not wants to suppport any plugin, this method needs to be overwritten
      *
      */
     public function runPluginsBeforeTheme()

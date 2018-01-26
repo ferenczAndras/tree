@@ -36,9 +36,14 @@ abstract class Plugin extends PluginHook
     public static $IDENTIFIER = "";
 
     /**
-     * @var string used to get the active theme settings
+     * @var string used to get the active plugin list
      */
     public static $ACTIVE_PLUGINS_SETTINGS_KEY = "activePlugins";
+
+    /**
+     * @var string used to get the installed plugin list
+     */
+    public static $INSTALLED_PLUGINS_SETTINGS_KEY = "installedPlugins";
 
     /**
      * Holds the current theme base directory path

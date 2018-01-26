@@ -25,6 +25,7 @@ require_once __DIR__ . '/model/RequiredPlugins.php';
  */
 if (defined('ADMINPATH')):
 
+    require_once __DIR__ . '/model/InstalledPlugins.php';
     require_once __DIR__ . '/model/PluginManager.php';
 
 endif;

@@ -104,7 +104,7 @@ abstract class DatabaseModel extends Object
     /**
      * @return array of the sql scripts in string format
      */
-    public function tableInstallerScripts()
+    public static function tableInstallerScripts()
     {
         return array();
     }

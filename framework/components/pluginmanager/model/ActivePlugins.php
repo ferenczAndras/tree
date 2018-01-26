@@ -102,7 +102,7 @@ class ActivePlugins extends Object
 
                 $plugin = new $pluginClass();
 
-                $plugin->runBefore();
+                $plugin->runPluginBeforeTheme();
 
             } else {
                 throw new PluginLoaderException("Unable to initialize the $pluginIdentifier plugin main class. ");

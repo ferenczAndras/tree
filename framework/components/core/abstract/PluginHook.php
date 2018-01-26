@@ -28,46 +28,58 @@ abstract class PluginHook extends Object
     /**
      *
      */
-    public function runBefore()
+    public function runPluginBeforeTheme()
     {
         if (App::app()->type() === App::$APP_THEME)
-            $this->runBeforeTheme();
+            $this->runPluginHookBeforeTheme();
         else if (App::app()->type() === App::$APP_ADMIN)
-            $this->runBeforeAdmin();
+            $this->runPluginHookBeforeAdmin();
     }
+
+    /**
+     *
+     */
+    public function runPluginAfterTheme()
+    {
+        if (App::app()->type() === App::$APP_THEME)
+            $this->runPluginHookAfterTheme();
+        else if (App::app()->type() === App::$APP_ADMIN)
+            $this->runPluginHookAfterAdmin();
+    }
+
 
     /**
      *   This method is the one, where the plugin can do it's own magic.
      * It can run it's own Controller, or initialize all the necessary stufs for the theme
      *
      */
-    protected function runBeforeTheme()
+    protected function runPluginHookBeforeTheme()
     {
-        throw new UnImplementedMethodException("runBeforeTheme() must be implemented in the plugin");
+        throw new UnImplementedMethodException("runPluginHookBeforeTheme() must be implemented in the plugin");
     }
 
     /**
      *
      */
-    protected function runAfterTheme()
+    protected function runPluginHookAfterTheme()
     {
-        throw new UnImplementedMethodException("runAfterTheme() must be implemented in the plugin");
+        throw new UnImplementedMethodException("runPluginHookAfterTheme() must be implemented in the plugin");
     }
 
     /**
      *
      */
-    protected function runBeforeAdmin()
+    protected function runPluginHookBeforeAdmin()
     {
-        throw new UnImplementedMethodException("runAdmin() must be implemented in the plugin");
+        throw new UnImplementedMethodException("runPluginHookBeforeAdmin() must be implemented in the plugin");
     }
 
     /**
      *
      */
-    protected function runAfterAdmin()
+    protected function runPluginHookAfterAdmin()
     {
-        throw new UnImplementedMethodException("runAdmin() must be implemented in the plugin");
+        throw new UnImplementedMethodException("runPluginHookAfterAdmin() must be implemented in the plugin");
     }
 
 }

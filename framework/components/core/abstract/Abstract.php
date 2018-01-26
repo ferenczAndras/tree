@@ -29,6 +29,7 @@ require_once __DIR__ . '/PluginHook.php';
 require_once __DIR__ . '/Plugin.php';
 require_once __DIR__ . '/ThemeHook.php';
 require_once __DIR__ . '/Theme.php';
+require_once __DIR__ . '/AdminTheme.php';
 require_once __DIR__ . '/Email.php';
 
 if (defined('ADMINPATH')):
