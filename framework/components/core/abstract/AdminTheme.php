@@ -27,7 +27,7 @@ class AdminTheme extends Theme
      */
     public function isUserLoggedIn()
     {
-        return true;//|| App::app()->login()->isUserLoggedIn();
+        return App::app()->login()->isUserLoggedIn();
     }
 
     public function redirectToLoginPage()

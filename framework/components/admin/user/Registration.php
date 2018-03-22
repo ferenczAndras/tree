@@ -70,6 +70,7 @@ class Registration extends Object
             $this->registerNewUser($_POST['user_name'], $_POST['user_email'], $_POST['user_password_new'], $_POST['user_password_repeat'], $_POST["captcha"]);
             // if we have such a GET request, call the verifyNewUser() method
         } else if (isset($_GET["id"]) && isset($_GET["verification_code"])) {
+
             $this->verifyNewUser($_GET["id"], $_GET["verification_code"]);
         }
     }
@@ -142,7 +143,7 @@ class Registration extends Object
             // finally if all the above checks are ok
         } else if ($this->databaseConnection()) {
             // check if username or email already exists
-            $query_check_user_name = $this->db_connection->prepare('SELECT user_name, user_email FROM users WHERE user_name=:user_name OR user_email=:user_email');
+            $query_check_user_name = $this->db_connection->prepare('SELECT user_name, user_email FROM ' . Login::$USERS_TABLE . ' WHERE user_name=:user_name OR user_email=:user_email');
             $query_check_user_name->bindValue(':user_name', $user_name, PDO::PARAM_STR);
             $query_check_user_name->bindValue(':user_email', $user_email, PDO::PARAM_STR);
             $query_check_user_name->execute();
@@ -164,11 +165,12 @@ class Registration extends Object
                 // compatibility library. the third parameter looks a little bit shitty, but that's how those PHP 5.5 functions
                 // want the parameter: as an array with, currently only used with 'cost' => XX.
                 $user_password_hash = password_hash($user_password, PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
+
                 // generate random hash for email verification (40 char string)
                 $user_activation_hash = sha1(uniqid(mt_rand(), true));
 
                 // write new users data into database
-                $query_new_user_insert = $this->db_connection->prepare('INSERT INTO users (user_name, user_password_hash, user_email, user_activation_hash, user_registration_ip, user_registration_datetime) VALUES(:user_name, :user_password_hash, :user_email, :user_activation_hash, :user_registration_ip, now())');
+                $query_new_user_insert = $this->db_connection->prepare('INSERT INTO ' . Login::$USERS_TABLE . '  (user_name, user_password_hash, user_email, user_activation_hash, user_registration_ip, user_registration_datetime) VALUES(:user_name, :user_password_hash, :user_email, :user_activation_hash, :user_registration_ip, now())');
                 $query_new_user_insert->bindValue(':user_name', $user_name, PDO::PARAM_STR);
                 $query_new_user_insert->bindValue(':user_password_hash', $user_password_hash, PDO::PARAM_STR);
                 $query_new_user_insert->bindValue(':user_email', $user_email, PDO::PARAM_STR);
@@ -179,6 +181,7 @@ class Registration extends Object
                 // id of new user
                 $user_id = $this->db_connection->lastInsertId();
 
+
                 if ($query_new_user_insert) {
                     // send a verification email
                     if ($this->sendVerificationEmail($user_id, $user_email, $user_activation_hash)) {
@@ -187,7 +190,7 @@ class Registration extends Object
                         $this->registration_successful = true;
                     } else {
                         // delete this users account immediately, as we could not send a verification email
-                        $query_delete_user = $this->db_connection->prepare('DELETE FROM users WHERE user_id=:user_id');
+                        $query_delete_user = $this->db_connection->prepare('DELETE FROM ' . Login::$USERS_TABLE . ' WHERE user_id=:user_id');
                         $query_delete_user->bindValue(':user_id', $user_id, PDO::PARAM_INT);
                         $query_delete_user->execute();
 
@@ -235,6 +238,7 @@ class Registration extends Object
         $mail->From = EMAIL_ADMIN_FROM;
         $mail->FromName = App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT);
         $mail->AddAddress($user_email);
+
         $mail->Subject = L::t("Account activation for " . App::app()->settings()->get(Settings::$SETTING_APP_NAME, Settings::$SETTING_APP_NAME_DEFAULT), "AdminRegistration");
 
         $link = App::getUrl(App::app()->adminFolder()) . '?id=' . urlencode($user_id) . '&verification_code=' . urlencode($user_activation_hash);
@@ -248,12 +252,18 @@ class Registration extends Object
             ->setLink($link)
             ->render();
 
+//        var_dump($body);
+
         $mail->IsHTML(true);
 
-
         if (!$mail->Send()) {
+
             $this->errors[] = L::t("Verification Mail was not successfully sent! Error: ", "AdminRegistration") . $mail->ErrorInfo;
-            return false;
+
+            if (App::app()->isDevelopment())
+                $this->errors[] = L::t("Link: " . $link);
+
+            return App::app()->isDevelopment() == true ? true : false;
         } else {
             return true;
         }
@@ -270,7 +280,7 @@ class Registration extends Object
         // if database connection opened
         if ($this->databaseConnection()) {
             // try to update user with specified information
-            $query_update_user = $this->db_connection->prepare('UPDATE users SET user_active = 1, user_activation_hash = NULL WHERE user_id = :user_id AND user_activation_hash = :user_activation_hash');
+            $query_update_user = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . '  SET user_active = 1, user_activation_hash = NULL WHERE user_id = :user_id AND user_activation_hash = :user_activation_hash');
             $query_update_user->bindValue(':user_id', intval(trim($user_id)), PDO::PARAM_INT);
             $query_update_user->bindValue(':user_activation_hash', $user_activation_hash, PDO::PARAM_STR);
             $query_update_user->execute();

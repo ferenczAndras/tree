@@ -33,7 +33,20 @@ use tree\email\generator\HtmlEmailBodyGenerator;
 class Login extends Object
 {
 
-    public static $SUPER_ADMIN = "superadmin";
+    /**
+     * @var string $USERS_TABLE users table name holder
+     */
+    public static $USERS_TABLE = "tree_users";
+
+    /**
+     * @var string $ADMIN_TYPE_SUPER super admin identifier
+     */
+    public static $ADMIN_TYPE_SUPER = "superadmin";
+
+    /**
+     * @var string $ADMIN_TYPE_ADMIN normal admin identifier
+     */
+    public static $ADMIN_TYPE_ADMIN = "admin";
 
     /**
      * @var object $db_connection The database connection
@@ -208,7 +221,7 @@ class Login extends Object
         // if database connection opened
         if ($this->databaseConnection()) {
             // database query, getting all the info of the selected user
-            $query_user = $this->db_connection->prepare('SELECT * FROM users WHERE user_name = :user_name');
+            $query_user = $this->db_connection->prepare('SELECT * FROM ' . Login::$USERS_TABLE . '  WHERE user_name = :user_name');
             $query_user->bindValue(':user_name', $user_name, PDO::PARAM_STR);
 
             $query_user->execute();
@@ -248,7 +261,7 @@ class Login extends Object
                 // cookie looks good, try to select corresponding user
                 if ($this->databaseConnection()) {
                     // get real token from database (and all other data)
-                    $sth = $this->db_connection->prepare("SELECT user_id, user_name, user_email FROM users WHERE user_id = :user_id
+                    $sth = $this->db_connection->prepare("SELECT user_id, user_name, user_email FROM " . Login::$USERS_TABLE . "  WHERE user_id = :user_id
                                                       AND user_rememberme_token = :user_rememberme_token AND user_rememberme_token IS NOT NULL");
                     $sth->bindValue(':user_id', $user_id, PDO::PARAM_INT);
                     $sth->bindValue(':user_rememberme_token', $token, PDO::PARAM_STR);
@@ -308,7 +321,7 @@ class Login extends Object
                 // if user has typed a valid email address, we try to identify him with his user_email
             } else if ($this->databaseConnection()) {
                 // database query, getting all the info of the selected user
-                $query_user = $this->db_connection->prepare('SELECT * FROM users WHERE user_email = :user_email');
+                $query_user = $this->db_connection->prepare('SELECT * FROM ' . Login::$USERS_TABLE . '  WHERE user_email = :user_email');
                 $query_user->bindValue(':user_email', trim($user_name), PDO::PARAM_STR);
                 $query_user->execute();
                 // get result row (as an object)
@@ -336,8 +349,8 @@ class Login extends Object
             } else if (!password_verify($user_password, $result_row->user_password_hash)) {
 
                 // increment the failed login counter for that user
-                $sth = $this->db_connection->prepare('UPDATE users '
-                    . 'SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login '
+                $sth = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE
+                    . ' SET user_failed_logins = user_failed_logins+1, user_last_failed_login = :user_last_failed_login '
                     . 'WHERE user_name = :user_name OR user_email = :user_name');
                 $sth->execute(array(':user_name' => $user_name, ':user_last_failed_login' => time()));
 
@@ -359,20 +372,20 @@ class Login extends Object
                 $_SESSION['user_id'] = $result_row->user_id;
                 $_SESSION['user_name'] = $result_row->user_name;
                 $_SESSION['user_email'] = $result_row->user_email;
-                $_SESSION['user_type'] = $result_row->user_type;
+                $_SESSION['user_type'] = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
                 $_SESSION['user_logged_in'] = 1;
 
                 // declare user id, set the login status to true
                 $this->user_id = $result_row->user_id;
                 $this->user_name = $result_row->user_name;
                 $this->user_email = $result_row->user_email;
-                $this->user_type = $result_row->user_type;
+                $this->user_type = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
 
                 $this->user_is_logged_in = true;
 
                 // reset the failed login counter for that user
-                $sth = $this->db_connection->prepare('UPDATE users '
-                    . 'SET user_failed_logins = 0, user_last_failed_login = NULL '
+                $sth = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE
+                    . ' SET user_failed_logins = 0, user_last_failed_login = NULL '
                     . 'WHERE user_id = :user_id AND user_failed_logins != 0');
                 $sth->execute(array(':user_id' => $result_row->user_id));
 
@@ -396,7 +409,7 @@ class Login extends Object
                         $user_password_hash = password_hash($user_password, PASSWORD_DEFAULT, array('cost' => HASH_COST_FACTOR));
 
                         // TODO: this should be put into another method !?
-                        $query_update = $this->db_connection->prepare('UPDATE users SET user_password_hash = :user_password_hash WHERE user_id = :user_id');
+                        $query_update = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . '  SET user_password_hash = :user_password_hash WHERE user_id = :user_id');
                         $query_update->bindValue(':user_password_hash', $user_password_hash, PDO::PARAM_STR);
                         $query_update->bindValue(':user_id', $result_row->user_id, PDO::PARAM_INT);
                         $query_update->execute();
@@ -421,7 +434,7 @@ class Login extends Object
         if ($this->databaseConnection()) {
             // generate 64 char random string and store it in current user data
             $random_token_string = hash('sha256', mt_rand());
-            $sth = $this->db_connection->prepare("UPDATE users SET user_rememberme_token = :user_rememberme_token WHERE user_id = :user_id");
+            $sth = $this->db_connection->prepare("UPDATE " . Login::$USERS_TABLE . " SET user_rememberme_token = :user_rememberme_token WHERE user_id = :user_id");
             $sth->execute(array(':user_rememberme_token' => $random_token_string, ':user_id' => $_SESSION['user_id']));
 
             // generate cookie string that consists of userid, randomstring and combined hash of both
@@ -443,7 +456,7 @@ class Login extends Object
             // if database connection opened
             if ($this->databaseConnection()) {
                 // Reset rememberme token
-                $sth = $this->db_connection->prepare("UPDATE users SET user_rememberme_token = NULL WHERE user_id = :user_id");
+                $sth = $this->db_connection->prepare("UPDATE " . Login::$USERS_TABLE . " SET user_rememberme_token = NULL WHERE user_id = :user_id");
                 $sth->execute(array(':user_id' => $_SESSION['user_id']));
             }
         }
@@ -501,7 +514,7 @@ class Login extends Object
                 $this->errors[] = L::t("Sorry, that username is already taken. Please choose another one.", "AdminLogin");
             } else {
                 // write user's new data into database
-                $query_edit_user_name = $this->db_connection->prepare('UPDATE users SET user_name = :user_name WHERE user_id = :user_id');
+                $query_edit_user_name = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . ' SET user_name = :user_name WHERE user_id = :user_id');
                 $query_edit_user_name->bindValue(':user_name', $user_name, PDO::PARAM_STR);
                 $query_edit_user_name->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
                 $query_edit_user_name->execute();
@@ -533,7 +546,7 @@ class Login extends Object
 
         } else if ($this->databaseConnection()) {
             // check if new email already exists
-            $query_user = $this->db_connection->prepare('SELECT * FROM users WHERE user_email = :user_email');
+            $query_user = $this->db_connection->prepare('SELECT * FROM ' . Login::$USERS_TABLE . ' WHERE user_email = :user_email');
             $query_user->bindValue(':user_email', $user_email, PDO::PARAM_STR);
             $query_user->execute();
             // get result row (as an object)
@@ -544,7 +557,7 @@ class Login extends Object
                 $this->errors[] = L::t("This email address is already registered. Please use the \"I forgot my password\" page if you don't remember it.", "AdminLogin");
             } else {
                 // write users new data into database
-                $query_edit_user_email = $this->db_connection->prepare('UPDATE users SET user_email = :user_email WHERE user_id = :user_id');
+                $query_edit_user_email = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . ' SET user_email = :user_email WHERE user_id = :user_id');
                 $query_edit_user_email->bindValue(':user_email', $user_email, PDO::PARAM_STR);
                 $query_edit_user_email->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
                 $query_edit_user_email->execute();
@@ -597,7 +610,7 @@ class Login extends Object
                     $user_password_hash = password_hash($user_password_new, PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 
                     // write users new hash into database
-                    $query_update = $this->db_connection->prepare('UPDATE users SET user_password_hash = :user_password_hash WHERE user_id = :user_id');
+                    $query_update = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . ' SET user_password_hash = :user_password_hash WHERE user_id = :user_id');
                     $query_update->bindValue(':user_password_hash', $user_password_hash, PDO::PARAM_STR);
                     $query_update->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
                     $query_update->execute();
@@ -643,7 +656,7 @@ class Login extends Object
             if (isset($result_row->user_id)) {
 
                 // database query:
-                $query_update = $this->db_connection->prepare('UPDATE users SET user_password_reset_hash = :user_password_reset_hash,
+                $query_update = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . ' SET user_password_reset_hash = :user_password_reset_hash,
                                                                user_password_reset_timestamp = :user_password_reset_timestamp
                                                                WHERE user_name = :user_name');
                 $query_update->bindValue(':user_password_reset_hash', $user_password_reset_hash, PDO::PARAM_STR);
@@ -795,7 +808,7 @@ class Login extends Object
             $user_password_hash = password_hash($user_password_new, PASSWORD_DEFAULT, array('cost' => $hash_cost_factor));
 
             // write users new hash into database
-            $query_update = $this->db_connection->prepare('UPDATE users SET user_password_hash = :user_password_hash,
+            $query_update = $this->db_connection->prepare('UPDATE ' . Login::$USERS_TABLE . '  SET user_password_hash = :user_password_hash,
                                                            user_password_reset_hash = NULL, user_password_reset_timestamp = NULL
                                                            WHERE user_name = :user_name AND user_password_reset_hash = :user_password_reset_hash');
             $query_update->bindValue(':user_password_hash', $user_password_hash, PDO::PARAM_STR);
