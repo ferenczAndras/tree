@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\model;
+namespace plugin\blog\model;
 
 /**
  * No direct access to this file.
@@ -16,7 +16,7 @@ use tree\core\BaseModel;
  * Class BlogCategoryModel
  * @category  Admin panel model
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  */
@@ -39,9 +39,9 @@ class BlogCategoryModel extends BaseModel
         self::$_instance = $this;
     }
 
-    public function getCategories()
+    public static function getCategories()
     {
-        return App::app()->db()->get($this->getTable());
+        return App::app()->db()->get("tree_plugin_blog_category");
     }
 
     public function getInfoMessage()
@@ -117,7 +117,7 @@ class BlogCategoryModel extends BaseModel
                 if ($ok) {
                     $this->messages[] = "The " . $value . " category was updated successfully!";
                     $this->clearPostData();
-                    App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "edited the " . $n . " blog category", self::$_EDIT_ACTIVITY_GETTER, $n, "blogcategories");
+//                    App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "edited the " . $n . " blog category", self::$_EDIT_ACTIVITY_GETTER, $n, "blogcategories");
                 } else {
                     $this->errors[] = "Something went wrong updating the " . $value . " category!";
                 }
@@ -173,7 +173,7 @@ class BlogCategoryModel extends BaseModel
             if ($ok) {
                 $this->messages[] = "The $n (" . $value . ") category was created successfully!";
                 $this->clearPostData();
-                App::app()->get("activitytracker")->newCreateActivity(App::app()->get("login")->getUsername(), "created the " . $n . " blog category", self::$_CREATE_ACTIVITY_GETTER, $n, "blogcategories");
+//                App::app()->get("activitytracker")->newCreateActivity(App::app()->get("login")->getUsername(), "created the " . $n . " blog category", self::$_CREATE_ACTIVITY_GETTER, $n, "blogcategories");
             } else {
                 $this->errors[] = "Something went wrong creating the category.";
             }
@@ -217,7 +217,7 @@ class BlogCategoryModel extends BaseModel
 
             $res = App::app()->db()->delete($this->getTable());
             if ($res) {
-                App::app()->get("activitytracker")->newDeleteActivity(App::app()->get("login")->getUsername(), "deleted the " . $name . " blog category", self::$_DELETE_ACTIVITY_GETTER, $name, "blogcategories");
+//                App::app()->get("activitytracker")->newDeleteActivity(App::app()->get("login")->getUsername(), "deleted the " . $name . " blog category", self::$_DELETE_ACTIVITY_GETTER, $name, "blogcategories");
             }
         endif;
     }
@@ -248,11 +248,10 @@ class BlogCategoryModel extends BaseModel
     public static function tableInstallerScripts()
     {
         return array("CREATE TABLE `tree_plugin_blog_category` (
-                          `id` int(11) NOT NULL,
+                          `id` int(11) NOT NULL PRIMARY KEY auto_increment,
                           `name` text NOT NULL,
                           `value` varchar(255) NOT NULL
-                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
-            "ALTER TABLE `tree_plugin_blog_category` ADD PRIMARY KEY (`id`);");
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     }
 
 

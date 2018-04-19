@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\controller;
+namespace plugin\blog\controller\admin;
 
 /**
  * No direct access to this file.
@@ -8,8 +8,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use plugin\blog\model\BlogCategoryModel;
 use plugin\blog\Blog;
-use tree\App as App;
 use tree\core\PluginController;
 
 /**
@@ -46,7 +46,7 @@ class BlogcategoriesController extends PluginController
             $param['messages'] = $this->model->messages;
         }
 
-        $this->renderView("blog/categories", $param);
+        $this->renderView("category/categories", $param);
     }
 
     public function actionEdit()
@@ -63,7 +63,7 @@ class BlogcategoriesController extends PluginController
 
         $param['infomessage'] = $this->model->getInfoMessage();
 
-        $this->renderView("blog/categories", $param);
+        $this->renderView("category/categories", $param);
 
     }
 
@@ -82,7 +82,7 @@ class BlogcategoriesController extends PluginController
 
         $param['infomessage'] = $this->model->getInfoMessage();
 
-        $this->renderView("blog/categories", $param);
+        $this->renderView("category/categories", $param);
     }
 
 

@@ -1,54 +1,60 @@
 <?php
-namespace app\admin\controller;
+namespace plugin\blog\controller\admin;
 
-use app\admin\AdminApplication as App;
-use app\admin\model\BlogModel;
-use tree\components\Controller;
+/**
+ * No direct access to this file.
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use plugin\blog\Blog;
+use tree\App as App;
+use plugin\blog\model\BlogModel;
+use tree\core\PluginController;
 
 /**
  * Class BlogController
  * @category  Admin panel controller
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  */
-class BlogController extends Controller
+class BlogController extends PluginController
 {
-
 
     public function __construct()
     {
         $this->footer = false;
         $this->actions = array("index", "delete", "ajax", "new", "edit");
 
-        $assets = App::app()->assets;
-        $assets->addCss("assets/posts/posts.css");
+        App::app()->theme()->getAssets()->addCss("assets/posts/posts.css");
 
-        $this->setAssets($assets);
-        $this->setDir(App::app()->get("dir"));
+        $this->setPluginDirectory(Blog::plugin()->getDir());
+
         $this->model = new BlogModel();
     }
 
     public function actionIndex()
     {
-        $this->renderView("blog/index");
+        $this->renderView("blog/blog");
     }
 
     public function actionNew()
     {
         $param = array();
 
-        if (!empty($this->model->errors)) {
-            $param['errors'] = $this->model->errors;
+        if (!empty($this->model->getErrors())) {
+            $param['errors'] = $this->model->getErrors();
         }
         if (!empty($this->model->messages)) {
-            $param['messages'] = $this->model->messages;
+            $param['messages'] = $this->model->getMessages();
         }
 
-        if (empty($this->model->errors) && !empty($this->model->messages)) {
+        if (empty($this->model->getErrors()) && !empty($this->model->getMessages())) {
 
-            $this->renderView("blog/index");
+            $this->renderView("blog/blog");
 
         } else {
 
@@ -69,7 +75,7 @@ class BlogController extends Controller
         }
         if (empty($this->model->errors) && !empty($this->model->messages)) {
 
-            $this->renderView("blog/index", $param);
+            $this->renderView("blog/blog", $param);
 
         } else {
 
@@ -82,7 +88,7 @@ class BlogController extends Controller
                 $this->renderView("blog/edit", $param);
             } else {
 
-                $this->renderView("blog/index", $param);
+                $this->renderView("blog/blog", $param);
 
             }
         }
@@ -98,7 +104,7 @@ class BlogController extends Controller
             $params['messages'] = $this->model->messages;
         }
 
-        $this->renderView("blog/index", $params);
+        $this->renderView("blog/blog", $params);
     }
 
     public function actionAjax()
@@ -122,7 +128,7 @@ class BlogController extends Controller
                     "getter" => "id",
                     "urlparam" => "id",
                     "param" => "title",
-                    "urlendparam" => "sec=" . base64_encode(BlogModel::$_SEC_KEY),
+                    "urlendparam" => "sec=" . $model->getSecretKey(),
                     "results" => $res
                 ];
         }

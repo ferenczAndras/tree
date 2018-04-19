@@ -1,6 +1,13 @@
 <?php
 namespace plugin\blog\controller\admin;
 
+/**
+ * No direct access to this file.
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 
 use app\admin\model\BlogCategoryModel;
 use app\admin\model\BlogModel;

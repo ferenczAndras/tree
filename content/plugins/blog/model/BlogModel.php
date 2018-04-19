@@ -1,5 +1,5 @@
 <?php
-namespace app\admin\model;
+namespace plugin\blog\model;
 
 /**
  * No direct access to this file.
@@ -15,7 +15,7 @@ use tree\core\BaseModel;
  * Class PostModel
  * @category  Admin panel model
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  */
@@ -49,6 +49,7 @@ class BlogModel extends BaseModel
 
     public function handlePost()
     {
+
         if (isset($_POST['Post']) && isset($_POST['newpost']) && $this->handleSecurityFormPost()) {
             $this->handleNewPost();
         } else if (isset($_POST['Post']) && isset($_POST['editpost']) && $this->handleSecurityFormPost()) {
@@ -72,7 +73,7 @@ class BlogModel extends BaseModel
 
         if ($res) {
             $this->messages[] = $name . " deleted successfully!";
-            App::app()->get("activitytracker")->newDeleteActivity(App::app()->get("login")->getUsername(), "deleted the " . $name . " blog post.", self::$_DELETE_ACTIVITY_GETTER, $name, "blog");
+//            App::app()->get("activitytracker")->newDeleteActivity(App::app()->get("login")->getUsername(), "deleted the " . $name . " blog post.", self::$_DELETE_ACTIVITY_GETTER, $name, "blog");
             return true;
         } else {
             $this->errors[] = "Something went wrong!";
@@ -93,6 +94,7 @@ class BlogModel extends BaseModel
 
                     if (isset($post['category'])) {
 
+
                         if (isset($_POST['featuredimage'])) {
                             $post['images'] = '["' . $_POST['featuredimage'] . '"]';
                         }
@@ -104,17 +106,20 @@ class BlogModel extends BaseModel
                         $post['title'] = json_encode($post['title']);
                         $post['content_one_sentence'] = json_encode($post['content_one_sentence']);
 
+                        App::app()->db()->startTransaction();
 
                         $ok = App::app()->db()->insert($this->getTable(), $post);
 
+                        App::app()->db()->commit();
+
                         if ($ok) {
 
-                            App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "created the " . $n . " blog post", self::$_EDIT_ACTIVITY_GETTER, $post['title'], "blog");
-                            $this->messages[] = "Post $n created successfully!";
+//                            App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "created the " . $n . " blog post", self::$_EDIT_ACTIVITY_GETTER, $post['title'], "blog");
+                            $this->addMessage( "Post $n created successfully!");
 
                         } else {
 
-                            $this->errors[] = "Something went wrong saving the post... Please try again later.";
+                            $this->errors[] = "Something went wrong saving the post... Please try again later.\nE: ".  App::app()->db()->getLastError();
 
                         }
 
@@ -128,6 +133,58 @@ class BlogModel extends BaseModel
                 $this->errors[] = "The title is required!";
             }
         }
+    }
+
+
+    public function handleNewPostWithTransaction(){
+
+        $post = $_POST['Post'];
+
+        if (parent::validateArray($post)) {
+
+            if ($this->checkTitle($post)) {
+
+                if (!$this->getPostByUrl($post['url'], $post['short_url'])) {
+
+
+                    if (isset($post['category'])) {
+
+
+                        if (isset($_POST['featuredimage'])) {
+                            $post['images'] = '["' . $_POST['featuredimage'] . '"]';
+                        }
+
+                        $post['category'] = json_encode($post['category']);
+                        $post['content'] = json_encode($post['content']);
+                        $n = $this->generateName($post['title']);
+
+                        $post['title'] = json_encode($post['title']);
+                        $post['content_one_sentence'] = json_encode($post['content_one_sentence']);
+
+
+                        $ok = App::app()->db()->query('CALL insertPostWTransaction()');
+
+
+                        if ($ok) {
+
+//                            App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "created the " . $n . " blog post", self::$_EDIT_ACTIVITY_GETTER, $post['title'], "blog");
+                            $this->addMessage( "Post $n created successfully!");
+
+                        } else {
+                            $this->errors[] = "Something went wrong saving the post... Please try again later.\nE: ".  App::app()->db()->getLastError();
+                        }
+
+                    } else {
+                        $this->errors[] = "You have to select at least one category for the post!";
+                    }
+                } else {
+                    $this->errors[] = "The url / short url already exists in the database!";
+                }
+            } else {
+                $this->errors[] = "The title is required!";
+            }
+        }
+
     }
 
 
@@ -166,7 +223,7 @@ class BlogModel extends BaseModel
 
                         if ($ok) {
 
-                            App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "edited the " . $n . " blog post", self::$_EDIT_ACTIVITY_GETTER, $post['title'], "blog");
+//                            App::app()->get("activitytracker")->newEditActivity(App::app()->get("login")->getUsername(), "edited the " . $n . " blog post", self::$_EDIT_ACTIVITY_GETTER, $post['title'], "blog");
 
                             $this->messages[] = "Post $n edited successfully!";
 
@@ -296,7 +353,7 @@ class BlogModel extends BaseModel
     public static function tableInstallerScripts()
     {
             return array("CREATE TABLE `tree_plugin_blog` (
-                          `id` bigint(11) NOT NULL,
+                          `id` bigint(11) NOT NULL PRIMARY KEY auto_increment,
                           `url` text NOT NULL,
                           `short_url` text NOT NULL,
                           `time` int(22) NOT NULL,
@@ -310,7 +367,6 @@ class BlogModel extends BaseModel
                           `settings` mediumtext NOT NULL,
                           `password` varchar(255) NOT NULL,
                           `view_count` bigint(22) NOT NULL
-                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
-                "ALTER TABLE `tree_plugin_blog` ADD PRIMARY KEY (`id`);");
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     }
 }
