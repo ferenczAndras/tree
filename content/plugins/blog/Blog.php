@@ -1,6 +1,6 @@
 <?php
 
-namespace plugin\transportmures;
+namespace plugin\blog;
 
 /**
  * No direct access to this file.
@@ -25,7 +25,7 @@ class Blog extends Plugin
 
     public function runPluginHookBeforeTheme()
     {
-
+        // nothing to be done yet
     }
 
 
@@ -51,13 +51,21 @@ class Blog extends Plugin
         return [
 
             "type" => "normal",
-            "icon" => "fa fa-file",
+            "icon" => "fa fa-rss",
             "url" => "#",
             "title" => "Blog",
             "items" => [
                 [
                     "title" => "Posts",
                     "url" => "blog"
+                ],
+                [
+                    "title" => "New Post",
+                    "url" => "blog/new"
+                ],
+                [
+                    "title" => "Categories",
+                    "url" => "blogcategories"
                 ]
             ],
 

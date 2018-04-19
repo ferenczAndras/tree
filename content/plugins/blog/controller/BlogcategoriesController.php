@@ -1,19 +1,26 @@
 <?php
 namespace app\admin\controller;
 
-use app\admin\AdminApplication as App;
-use app\admin\model\BlogCategoryModel;
-use tree\components\Controller;
+/**
+ * No direct access to this file.
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use plugin\blog\Blog;
+use tree\App as App;
+use tree\core\PluginController;
 
 /**
  * Class BlogCategoriesController
  * @category  Admin panel controller
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  */
-class BlogcategoriesController extends Controller
+class BlogcategoriesController extends PluginController
 {
 
     public function __construct()
@@ -22,8 +29,7 @@ class BlogcategoriesController extends Controller
 
         $this->actions = array("index", "edit", "delete");
 
-        $this->setDir(App::app()->get("dir"));
-        $this->setAssets(App::app()->assets);
+        $this->setPluginDirectory(Blog::plugin()->getDir());
 
         $this->model = new BlogCategoryModel();
     }

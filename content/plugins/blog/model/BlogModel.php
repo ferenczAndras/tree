@@ -1,8 +1,15 @@
 <?php
 namespace app\admin\model;
 
-use app\admin\AdminApplication as App;
-use tree\components\BaseModel;
+/**
+ * No direct access to this file.
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use tree\App as App;
+use tree\core\BaseModel;
 
 /**
  * Class PostModel
@@ -14,10 +21,6 @@ use tree\components\BaseModel;
  */
 class BlogModel extends BaseModel
 {
-    public static $_SEC_KEY = "Change_This_to_A_RaNdOM_Str1ng";
-    public static $_instance = null;
-
-    private static $TABLE_NAME = "af_blog";
 
     public static $_EDIT_ACTIVITY_GETTER = "editname";
     public static $_CREATE_ACTIVITY_GETTER = "createname";
@@ -27,9 +30,11 @@ class BlogModel extends BaseModel
 
     function __construct()
     {
-        parent::__construct();
+        $this->setTableName("tree_plugin_blog");
+        $this->initSecretKey("CHANGE_THIS_TO_A_fgdfdgSECRET_KEY");
 
         $this->handlePost();
+
         self::$_instance = $this;
     }
 
@@ -44,9 +49,9 @@ class BlogModel extends BaseModel
 
     public function handlePost()
     {
-        if (isset($_POST['Post']) && isset($_POST['newpost']) && $this->handleSecurityPOST()) {
+        if (isset($_POST['Post']) && isset($_POST['newpost']) && $this->handleSecurityFormPost()) {
             $this->handleNewPost();
-        } else if (isset($_POST['Post']) && isset($_POST['editpost']) && $this->handleSecurityPOST()) {
+        } else if (isset($_POST['Post']) && isset($_POST['editpost']) && $this->handleSecurityFormPost()) {
             $this->handleEditPost();
         }
 
@@ -54,7 +59,7 @@ class BlogModel extends BaseModel
 
     public function handleDelete()
     {
-        if (isset($_GET['id']) && $this->handleSecurityGET()) {
+        if (isset($_GET['id']) && $this->handleSecurityFormGet()) {
             return $this->deleteBlogPostById(base64_decode($_GET['id']), isset($_GET['n']) ? $_GET['n'] : "");
         }
         return false;
@@ -62,8 +67,8 @@ class BlogModel extends BaseModel
 
     private function deleteBlogPostById($id, $name)
     {
-        $this->_db->where("id", $id);
-        $res = $this->_db->delete(self::$TABLE_NAME);
+        App::app()->db()->where("id", $id);
+        $res = App::app()->db()->delete($this->getTable());
 
         if ($res) {
             $this->messages[] = $name . " deleted successfully!";
@@ -100,7 +105,7 @@ class BlogModel extends BaseModel
                         $post['content_one_sentence'] = json_encode($post['content_one_sentence']);
 
 
-                        $ok = $this->_db->insert(self::$TABLE_NAME, $post);
+                        $ok = App::app()->db()->insert($this->getTable(), $post);
 
                         if ($ok) {
 
@@ -155,9 +160,9 @@ class BlogModel extends BaseModel
                         $post['content_one_sentence'] = json_encode($post['content_one_sentence']);
 
 
-                        $this->_db->where("id", $id);
+                        App::app()->db()->where("id", $id);
 
-                        $ok = $this->_db->update(self::$TABLE_NAME, $post);
+                        $ok = App::app()->db()->update($this->getTable(), $post);
 
                         if ($ok) {
 
@@ -195,37 +200,13 @@ class BlogModel extends BaseModel
     }
 
 
-    private function handleSecurityPOST()
-    {
-        if (isset($_POST['sec']) == false) {
-            return false;
-        }
-        if (base64_decode($_POST['sec']) == self::$_SEC_KEY) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function handleSecurityGET()
-    {
-        if (isset($_GET['sec']) == false) {
-            return false;
-        }
-        if (base64_decode($_GET['sec']) == self::$_SEC_KEY) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * @return array|null
      */
     public function getEditPostByGet()
     {
 
-        if (isset($_GET['id']) && $this->handleSecurityGET()) {
+        if (isset($_GET['id']) && $this->handleSecurityFormGet()) {
             $id = isset($_GET['b']) ? base64_decode($_GET['id']) : $_GET['id'];
             $post = $this->getPostById($id);
 
@@ -250,18 +231,18 @@ class BlogModel extends BaseModel
 
     public function getPostById($id)
     {
-        $this->_db->where("id", $id);
-        return $this->_db->getOne(self::$TABLE_NAME);
+        App::app()->db()->where("id", $id);
+        return App::app()->db()->getOne($this->getTable());
     }
 
     public function getPostByUrl($url, $short_url)
     {
-        $this->_db->where("url", $url);
-        $this->_db->orWhere("url", $short_url);
-        $this->_db->orWhere("short_url", $short_url);
-        $this->_db->orWhere("short_url", $url);
+        App::app()->db()->where("url", $url);
+        App::app()->db()->orWhere("url", $short_url);
+        App::app()->db()->orWhere("short_url", $short_url);
+        App::app()->db()->orWhere("short_url", $url);
 
-        return $this->_db->getOne(self::$TABLE_NAME);
+        return App::app()->db()->getOne($this->getTable());
     }
 
 
@@ -272,20 +253,20 @@ class BlogModel extends BaseModel
 
     public function getPosts()
     {
-        $this->_db->orderBy("time");
-        return $this->_db->get(self::$TABLE_NAME);
+        App::app()->db()->orderBy("time");
+        return App::app()->db()->get($this->getTable());
     }
 
     public function getSearch($get)
     {
-        $this->_db->where("url", "%" . $get . "%", "LIKE");
-        $this->_db->orWhere("short_url", "%" . $get . "%", "LIKE");
-        $this->_db->orWhere("content", "%" . $get . "%", "LIKE");
-        $this->_db->orWhere("content_short", "%" . $get . "%", "LIKE");
-        $this->_db->orWhere("content_one_sentence", "%" . $get . "%", "LIKE");
-        $this->_db->orWhere("title", "%" . $get . "%", "LIKE");
+        App::app()->db()->where("url", "%" . $get . "%", "LIKE");
+        App::app()->db()->orWhere("short_url", "%" . $get . "%", "LIKE");
+        App::app()->db()->orWhere("content", "%" . $get . "%", "LIKE");
+        App::app()->db()->orWhere("content_short", "%" . $get . "%", "LIKE");
+        App::app()->db()->orWhere("content_one_sentence", "%" . $get . "%", "LIKE");
+        App::app()->db()->orWhere("title", "%" . $get . "%", "LIKE");
 
-        return $this->_db->get(self::$TABLE_NAME);
+        return App::app()->db()->get($this->getTable());
     }
 
     public
@@ -293,7 +274,7 @@ class BlogModel extends BaseModel
     {
         $response = array();
 
-        if (isset($_POST['title']) && isset($_POST['generateurl']) && $this->handleSecurityPOST()) {
+        if (isset($_POST['title']) && isset($_POST['generateurl']) && $this->handleSecurityFormPost()) {
 
             $response = $this->generateUrl();
         }
@@ -309,5 +290,27 @@ class BlogModel extends BaseModel
             str_replace(" ", "-", trim(strtolower(preg_replace('/\s+/', ' ', trim(substr($_POST['title'], 0, 80)))))),
             str_replace(" ", "-", trim(strtolower(preg_replace('/\s+/', ' ', trim(substr($_POST['title'], 0, 25))))))
         ];
+    }
+
+
+    public static function tableInstallerScripts()
+    {
+            return array("CREATE TABLE `tree_plugin_blog` (
+                          `id` bigint(11) NOT NULL,
+                          `url` text NOT NULL,
+                          `short_url` text NOT NULL,
+                          `time` int(22) NOT NULL,
+                          `images` text NOT NULL,
+                          `category` text NOT NULL,
+                          `content` mediumtext NOT NULL,
+                          `content_short` text NOT NULL,
+                          `content_one_sentence` text NOT NULL,
+                          `title` text NOT NULL,
+                          `status` varchar(100) NOT NULL,
+                          `settings` mediumtext NOT NULL,
+                          `password` varchar(255) NOT NULL,
+                          `view_count` bigint(22) NOT NULL
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+                "ALTER TABLE `tree_plugin_blog` ADD PRIMARY KEY (`id`);");
     }
 }

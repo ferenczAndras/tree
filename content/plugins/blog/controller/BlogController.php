@@ -130,26 +130,5 @@ class BlogController extends Controller
     }
 
 
-    public static $navbar = [
-
-        "type" => "normal",
-        "icon" => "fa fa-rss",
-        "url" => "",
-        "title" => "Blog",
-        "items" => [
-            [
-                "title" => "Blog Posts",
-                "url" => "blog"
-            ],
-            [
-                "title" => "New Blog Post",
-                "url" => "blog/new"
-            ],
-            [
-                "title" => "Blog Categories",
-                "url" => "blogcategories"
-            ]
-        ]
-    ];
 
 }

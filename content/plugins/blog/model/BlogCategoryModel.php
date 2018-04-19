@@ -1,7 +1,16 @@
 <?php
 namespace app\admin\model;
 
+/**
+ * No direct access to this file.
+ */
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 use tree\App as App;
+use tree\core\BaseModel;
+
 
 /**
  * Class BlogCategoryModel
@@ -14,35 +23,25 @@ use tree\App as App;
 class BlogCategoryModel extends BaseModel
 {
 
-    private static $TABLE_NAME = "af_blog_categories";
-
     public static $_EDIT_ACTIVITY_GETTER = "editname";
     public static $_CREATE_ACTIVITY_GETTER = "createname";
     public static $_SHOW_NAME = "showname";
     public static $_DELETE_ACTIVITY_GETTER = "deletename";
 
-    public static $seckey = "CHANGE_THIS_TO_A_SECRET_KEY";
-
-    public static $_instance = null;
 
     function __construct()
     {
-        parent::__construct();
-        $this->handlePOST();
-        self::$_instance = $this;
-    }
+        $this->setTableName("tree_plugin_blog_category");
+        $this->initSecretKey("CHAdsfsdfsfds)SGh_fgdfdgSECRET_KEY");
 
-    public static function getInstance()
-    {
-        if (self::$_instance == null) {
-            self::$_instance = new BlogCategoryModel();
-        }
-        return self::$_instance;
+        $this->handlePost();
+
+        self::$_instance = $this;
     }
 
     public function getCategories()
     {
-        return $this->_db->get(self::$TABLE_NAME);
+        return App::app()->db()->get($this->getTable());
     }
 
     public function getInfoMessage()
@@ -77,11 +76,11 @@ class BlogCategoryModel extends BaseModel
 
     private function handlePOST()
     {
-        if (isset($_POST['newcategory']) && isset($_POST['category']) && isset($_POST['value']) && $this->handeSecurityPOST()) {
+        if (isset($_POST['newcategory']) && isset($_POST['category']) && isset($_POST['value']) && $this->handleSecurityFormPost()) {
 
             $this->addNewCategory($_POST['category'], $_POST['value']);
 
-        } else if (isset($_POST['editcategory']) && isset($_POST['id']) && isset($_POST['category']) && isset($_POST['value']) && $this->handeSecurityPOST()) {
+        } else if (isset($_POST['editcategory']) && isset($_POST['id']) && isset($_POST['category']) && isset($_POST['value']) && $this->handleSecurityFormPost()) {
 
             $this->editCategory(base64_decode($_POST['id']), $_POST['category'], $_POST['value']);
         }
@@ -103,18 +102,18 @@ class BlogCategoryModel extends BaseModel
                 return;
             }
 
-            $this->_db->where("value", $value);
-            $this->_db->where("id", $id, "!=");
-            $c = $this->_db->getOne(self::$TABLE_NAME);
+            App::app()->db()->where("value", $value);
+            App::app()->db()->where("id", $id, "!=");
+            $c = App::app()->db()->getOne($this->getTable());
 
             if ($c == false) {
 
 
-                $this->_db->where('id', $id);
+                App::app()->db()->where('id', $id);
                 $n = $this->generateName($name);
                 $data = array("name" => json_encode($name), "value" => $value);
 
-                $ok = $this->_db->update(self::$TABLE_NAME, $data);
+                $ok = App::app()->db()->update($this->getTable(), $data);
                 if ($ok) {
                     $this->messages[] = "The " . $value . " category was updated successfully!";
                     $this->clearPostData();
@@ -133,9 +132,9 @@ class BlogCategoryModel extends BaseModel
     {
         if (strlen($value) > 0) {
 
-            $this->_db->where("value", $value);
+            App::app()->db()->where("value", $value);
 
-            $c = $this->_db->getOne(self::$TABLE_NAME);
+            $c = App::app()->db()->getOne($this->getTable());
             if ($c) {
                 return $c;
             } else {
@@ -166,8 +165,11 @@ class BlogCategoryModel extends BaseModel
             }
 
             $n = $this->generateName($name);
+
             $data = array("name" => json_encode($name), "value" => $value);
-            $ok = $this->_db->insert(self::$TABLE_NAME, $data);
+
+            $ok = App::app()->db()->insert($this->getTable(), $data);
+
             if ($ok) {
                 $this->messages[] = "The $n (" . $value . ") category was created successfully!";
                 $this->clearPostData();
@@ -187,8 +189,8 @@ class BlogCategoryModel extends BaseModel
             $id = base64_decode($_GET['id']);
             $name = base64_decode($_GET['k']);
 
-            $this->_db->where("id", $id);
-            $res = $this->_db->getOne(self::$TABLE_NAME);
+            App::app()->db()->where("id", $id);
+            $res = App::app()->db()->getOne($this->getTable());
 
             if ($res) {
 
@@ -211,31 +213,20 @@ class BlogCategoryModel extends BaseModel
             $id = $_GET['id'];
             $name = base64_decode($_GET['k']);
 
-            $this->_db->where("id", $id);
+            App::app()->db()->where("id", $id);
 
-            $res = $this->_db->delete(self::$TABLE_NAME);
+            $res = App::app()->db()->delete($this->getTable());
             if ($res) {
                 App::app()->get("activitytracker")->newDeleteActivity(App::app()->get("login")->getUsername(), "deleted the " . $name . " blog category", self::$_DELETE_ACTIVITY_GETTER, $name, "blogcategories");
             }
         endif;
     }
 
-    private function handeSecurityPOST()
-    {
-        if (isset($_POST['sec']) == false) {
-            return false;
-        }
-        if (base64_decode($_POST['sec']) == self::$seckey) {
-            return true;
-        }
-
-        return false;
-    }
 
     public function getSearch($get)
     {
-        $this->_db->where("name", "%" . $get . "%", "LIKE");
-        return $this->_db->get(self::$TABLE_NAME);
+        App::app()->db()->where("name", "%" . $get . "%", "LIKE");
+        return App::app()->db()->get($this->getTable());
     }
 
     public function clearPostData()
@@ -253,5 +244,19 @@ class BlogCategoryModel extends BaseModel
             $_POST['id'] = null;
         }
     }
+
+    public static function tableInstallerScripts()
+    {
+        return array("CREATE TABLE `tree_plugin_blog_category` (
+                          `id` int(11) NOT NULL,
+                          `name` text NOT NULL,
+                          `value` varchar(255) NOT NULL
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+            "ALTER TABLE `tree_plugin_blog_category` ADD PRIMARY KEY (`id`);");
+    }
+
+
+
+
 
 }
