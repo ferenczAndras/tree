@@ -372,15 +372,22 @@ class Login extends Object
                 $_SESSION['user_id'] = $result_row->user_id;
                 $_SESSION['user_name'] = $result_row->user_name;
                 $_SESSION['user_email'] = $result_row->user_email;
-                $_SESSION['user_type'] = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
+                if(isset($result_row->user_type)) {
+                    $_SESSION['user_type'] = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
+                } else {
+                    $_SESSION['user_type'] = Login::$ADMIN_TYPE_ADMIN;
+                }
                 $_SESSION['user_logged_in'] = 1;
 
                 // declare user id, set the login status to true
                 $this->user_id = $result_row->user_id;
                 $this->user_name = $result_row->user_name;
                 $this->user_email = $result_row->user_email;
-                $this->user_type = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
-
+                if(isset($result_row->user_type)) {
+                    $this->user_type = $result_row->user_type == null ? Login::$ADMIN_TYPE_ADMIN : $result_row->user_type;
+                } else {
+                    $_SESSION['user_type'] = Login::$ADMIN_TYPE_ADMIN;
+                }
                 $this->user_is_logged_in = true;
 
                 // reset the failed login counter for that user

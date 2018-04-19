@@ -5,6 +5,7 @@ namespace tree\core;
  * No direct access to this file.
  */
 
+use Pagekit\Application\Exception;
 use tree\App;
 
 if (!defined('ABSPATH')) {
@@ -24,24 +25,45 @@ if (!defined('ABSPATH')) {
 abstract class Updater extends Object
 {
 
-    private $updateMessages = "";
+    /**
+     * @var array $updateMessages A string array holding the update session messages
+     */
+    private $updateMessages = array();
 
+    /**
+     * @var null | boolean $updateAvailable Variable holding if there is an update available
+     */
     private $updateAvailable = null;
 
+    /**
+     * @var mixed $updateVersion Variable holding the new update version
+     */
     private $updateVersion = null;
 
+    /**
+     * @var mixed $updateReady Variable holding if the new update is ready to being updated
+     */
     private $updateReady = null;
 
+    /**
+     * @param $message string Saving new message to messages array
+     */
     public function addUpdateMessage($message)
     {
-        $this->updateMessages .= $message;
+        $this->updateMessages[] = $message;
     }
 
+    /**
+     * @return array Returns the messages array
+     */
     public function getUpdateMessages()
     {
         return $this->updateMessages;
     }
 
+    /**
+     * @return bool|null Downloads and saves if there is a new update available
+     */
     public function isUpdateAvailable()
     {
         if ($this->updateAvailable === null) {
@@ -60,6 +82,9 @@ abstract class Updater extends Object
         return $this->updateAvailable == null ? false : $this->updateAvailable;
     }
 
+    /**
+     * @return mixed Returns the new Update version
+     */
     public function getUpdateVersion()
     {
         return $this->updateVersion;
@@ -94,6 +119,28 @@ abstract class Updater extends Object
         return $this->updateReady == null ? false : $this->updateReady;
     }
 
+    /**
+     * @param $version string version of the update we want to delete
+     * @param $channel string channel of the update from where we want to delete
+     * @throws CoreUpdateException if something goes wrong
+     * @return bool if the update is deleted successfully true else false
+     */
+    private function deleteUpdate($version, $channel)
+    {
+        try {
+
+            if (is_file(UPDATESPATH . 'TREE-' . $version . '-' . $channel . '.zip')) {
+                unlink(UPDATESPATH . 'TREE-' . $version . '-' . $channel . '.zip');
+
+                return true;
+            }
+
+            return false;
+        } catch (Exception $e) {
+            throw new CoreUpdateException("Could not delete update. Operation aborted.");
+        }
+    }
+
 
     public function doUpdate($version, $channel)
     {
@@ -110,13 +157,13 @@ abstract class Updater extends Object
 
 
             //Make the directory if we need to...
-            if (!is_dir($_ENV['site']['files']['server-root'] . '/' . $thisFileDir)) {
-                mkdir($_ENV['site']['files']['server-root'] . '/' . $thisFileDir);
-                echo '<li>Created Directory ' . $thisFileDir . '</li>';
+            if (!is_dir(ABSPATH . '/' . $thisFileDir)) {
+                mkdir(ABSPATH . '/' . $thisFileDir);
+                echo '<li>Created Directory ' . ABSPATH . $thisFileDir . '</li>';
             }
 
             //Overwrite the file
-            if (!is_dir($_ENV['site']['files']['server-root'] . '/' . $thisFileName)) {
+            if (!is_dir(ABSPATH . '/' . $thisFileName)) {
                 echo '<li>' . $thisFileName . '...........';
                 $contents = zip_entry_read($aF, zip_entry_filesize($aF));
                 $contents = str_replace("\r\n", "\n", $contents);
@@ -131,7 +178,7 @@ abstract class Updater extends Object
                     unlink('upgrade.php');
                     echo ' EXECUTED</li>';
                 } else {
-                    $updateThis = fopen($_ENV['site']['files']['server-root'] . '/' . $thisFileName, 'w');
+                    $updateThis = fopen(ABSPATH . '/' . $thisFileName, 'w');
                     fwrite($updateThis, $contents);
                     fclose($updateThis);
                     unset($contents);
@@ -140,6 +187,8 @@ abstract class Updater extends Object
             }
         }
         echo '</ul>';
+
+        $this->deleteUpdate($version, $channel);
 
     }
 

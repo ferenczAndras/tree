@@ -132,7 +132,7 @@ abstract class Controller extends Object
      */
     public function actionIndex()
     {
-        throw new UnImplementedMethodException("actionIndex() is not implementd");
+        throw new UnImplementedMethodException("actionIndex() is not implemented");
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class Controller extends Object
      * public static function getSearchResults($get){
      *
      * $model = new model();
-     * $res = $model->getSearch($get);   // u get the result from a model, or form where you want.
+     * $res = $model->getSearch($get);   // you get the result from a model, or form where you want.
      *
      * if (count($res) > 0) {  // if the result contains something we handel it.
      *   return  [
