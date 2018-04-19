@@ -54,6 +54,29 @@ class L extends Object
         var_dump($this->languageArray);
     }
 
+    public function currentEditIdentifier(){
+
+//        if (isset($_GET['lang'])){
+//        }
+        return $this->identifier();
+    }
+
+    public function name($identifier){
+        return $this->languageNameFromIdentifier($identifier);
+    }
+
+    public function languageNameFromIdentifier($identifier){
+        if($identifier == "en" || $identifier == "EN")return "English";
+        return "Nan";
+    }
+
+    /**
+     * Returns the
+     * @return string
+     */
+    public function identifier(){
+        return "en";
+    }
 
 
     public function  __construct()

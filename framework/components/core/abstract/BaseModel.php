@@ -30,7 +30,6 @@ abstract class BaseModel extends DatabaseModel
 
     protected static $_instance = null;
 
-    protected $errors = array();
 
     /**
      * @return BaseModel | mixed
