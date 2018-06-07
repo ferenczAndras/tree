@@ -1,6 +1,6 @@
 <?php
 /**
- *            Bootstrap Default Theme main autoload
+ *            Bootstrap Default Theme Controller autoload
  * @category  Bootstrap Default Theme
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-present Affarit Studio
@@ -16,10 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once __DIR__ . '/controller/Controller.php';
 
-require_once __DIR__ . '/model/Model.php';
+require_once __DIR__ . '/HomeController.php';
 
-require_once __DIR__ . '/components/Components.php';
-
-require_once __DIR__ . '/BootstrapTheme.php';
+require_once __DIR__ . '/NotFoundController.php';

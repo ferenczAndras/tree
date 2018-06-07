@@ -19,51 +19,41 @@ class BootstrapThemeAssets extends Assets
     {
         parent::__construct();
 
-        $this->setTitle("TEST TITLE");
+        $this->setTitle("Bootstrap Theme Example - Tree Framework");
 
         $this->setBaseUrl(App::getUrl(""));
 
-        // Description of your site, max 150 letter
-        $this->setDescription("");
-        // Short description of your site's subject
-        $this->setSubject("");
-        // Very short sentence describing the purpose of the website
-        $this->setAbstract("");
-        // Describes the topic of the website
-        $this->setTopic("");
-        // Brief summary of the company or purpose of the website
-        $this->setSummary("");
-        // Full domain name or web address
-        $this->setUrl("");
-        // Does the same function as the keywords tag
-        $this->setCategory("");
-        // Makes sure your website shows up in all countries and languages
-        $this->setCoverage("Worldwide"); // THIS IS THE RECOMMENDED value for it
-        // Does the same as the coverage tag
-        $this->setDistribution("Global"); // this is the RECOMMENDED value for it
-        // Gives a general age rating based on sites content
-        $this->setRating("General");
 
-        // init the opengraph metas. These are used via facebook
-        $this->facebook = $this->facebook
-            ->appId("")
-            ->url("")
-            ->type("website")
-            ->title("")
-            ->image("")
-            ->description("")
-            ->siteName("")
-            ->locale("en_US")
-            ->author("");
 
-        $this->twitter = $this->twitter
-            ->summary("")
-            ->account("")
-            ->creator("")
-            ->url("")
-            ->title("")
-            ->description("")
-            ->image("");
+        $this->setBaseUrl(App::getUrl(""));
+
+
+        $this->css = array(
+            "content/themes/bootstrap/assets/css/linearicons.css",
+            "https://fonts.googleapis.com/css?family=Poppins:100,300,500",
+            "content/themes/bootstrap/assets/css/owl.carousel.css",
+            "content/themes/bootstrap/assets/css/font-awesome.min.css",
+            "content/themes/bootstrap/assets/css/nice-select.css",
+            "content/themes/bootstrap/assets/css/magnific-popup.css",
+            "content/themes/bootstrap/assets/css/bootstrap.css",
+            "content/themes/bootstrap/assets/css/main.css",
+        );
+
+
+        $this->footerScript = array(
+            "content/themes/bootstrap/assets/js/vendor/jquery-2.2.4.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js",
+            "content/themes/bootstrap/assets/js/vendor/bootstrap.min.js",
+            "content/themes/bootstrap/assets/js/jquery.ajaxchimp.min.js",
+            "content/themes/bootstrap/assets/js/owl.carousel.min.js",
+            "content/themes/bootstrap/assets/js/jquery.nice-select.min.js",
+            "content/themes/bootstrap/assets/js/jquery.magnific-popup.min.js",
+            "content/themes/bootstrap/assets/js/jquery.counterup.min.js",
+            "content/themes/bootstrap/assets/js/waypoints.min.js",
+            "content/themes/bootstrap/assets/js/main.js",
+        );
+
+
     }
 
 }

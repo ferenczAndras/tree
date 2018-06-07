@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use theme\bootstrap\controller\NotFoundController;
 use tree\App;
 use tree\core\Theme;
 
@@ -26,25 +27,17 @@ class BootstrapTheme extends Theme
 
     public function runTheme()
     {
-
         $c = ucfirst(App::app()->getPage()) . 'Controller';
-//
-        echo "RUN THEME CONTROLLER " . $c;
 
-//
-//        if (class_exists('\app\controller\core\\' . $c)) {
-//            $c = '\app\controller\core\\' . $c;
-//            $a = new $c();
-//            $a->runAction($this->page, $this->action);
-//
-//        } elseif (class_exists('\app\controller\\' . $c)) {
-//            $c = '\app\controller\\' . $c;
-//            $a = new $c();
-//            $a->runAction($this->page, $this->action);
-//        } else {
-//            $a = new NotFoundController();
-//            $a->runAction();
-//        }
+        if (class_exists('\theme\bootstrap\controller\\' . $c)) {
+            $c = '\theme\bootstrap\controller\\' . $c;
+            $a = new $c();
+            $a->runAction();
+
+        } else {
+            $a = new NotFoundController();
+            $a->runAction();
+        }
 
 
     }
