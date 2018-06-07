@@ -3,7 +3,7 @@
  *            Core components autoload
  * @category  Core components
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017 Affarit Studio
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
@@ -23,6 +23,10 @@ require_once __DIR__ . '/Meta.php';
 require_once __DIR__ . '/Assets.php';
 require_once __DIR__ . '/Settings.php';
 require_once __DIR__ . '/Sessions.php';
+
+require_once __DIR__ . '/Dumper.php';
+
+//require_once __DIR__ . '/Logger.php';
 
 if (defined('ADMINPATH')):
 

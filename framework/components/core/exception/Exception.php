@@ -27,3 +27,4 @@ require_once __DIR__ . '/IllegalInitException.php';
 require_once __DIR__ . '/NotInitializedException.php';
 require_once __DIR__ . '/DatabaseConnectionException.php';
 require_once __DIR__ . '/CoreUpdateException.php';
+require_once __DIR__ . '/MySqlDatabaseException.php';

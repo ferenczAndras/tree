@@ -30,10 +30,13 @@ abstract class PluginHook extends Object
      */
     public function runPluginBeforeTheme()
     {
-        if (App::app()->type() === App::$APP_THEME)
+        if (App::app()->type() === App::$APP_THEME) {
             $this->runPluginHookBeforeTheme();
-        else if (App::app()->type() === App::$APP_ADMIN)
+        }
+        else
+            if (App::app()->type() === App::$APP_ADMIN) {
             $this->runPluginHookBeforeAdmin();
+        }
     }
 
     /**

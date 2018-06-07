@@ -342,7 +342,7 @@ abstract class Application extends Router
         if (self::$instance != null) {
             return self::$instance;
         } else {
-            $c = __CLASS__;
+            $c = get_called_class();
             self::$instance = new $c();
             return self::$instance;
         }

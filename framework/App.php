@@ -20,7 +20,7 @@ use tree\thememanager\ThemeLoader;
  *            App class; Main Application
  * @category  Tree Framework main file
  * @author    Ferencz Andras <contact@ferenczandras.ro>
- * @copyright Copyright (c) 2016-2017 Affarit Studio
+ * @copyright Copyright (c) 2016-present Affarit Studio
  * @license   http://opensource.org/licenses/gpl-3.0.html GNU Public License
  * @link      https://github.com/ferenczAndras/tree
  * @link      http://www.affarit.com
@@ -38,7 +38,6 @@ class App extends Application
 
         if ($type === Application::$APP_THEME) {
             $this->initSettings(new Settings());
-
         } else {
             $this->initSettings(new AdminSettings());
         }
