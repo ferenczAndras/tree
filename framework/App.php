@@ -17,7 +17,7 @@ use tree\pluginmanager\ActivePlugins;
 use tree\thememanager\ThemeLoader;
 
 /**
- *            App; Main Application
+ *            App class; Main Application
  * @category  Tree Framework main file
  * @author    Ferencz Andras <contact@ferenczandras.ro>
  * @copyright Copyright (c) 2016-2017 Affarit Studio
@@ -34,7 +34,7 @@ class App extends Application
         $this->initAppType($type);
         $this->initMySqlDatabase();
         $this->initLanguage(new L());
-        $this->initActivePlugins(new ActivePlugins());
+        $this->initActivePlugins(new ActivePlugins(false));
 
         if ($type === Application::$APP_THEME) {
             $this->initSettings(new Settings());
@@ -42,7 +42,6 @@ class App extends Application
         } else {
             $this->initSettings(new AdminSettings());
         }
-
         $this->initApp($this);
     }
 
