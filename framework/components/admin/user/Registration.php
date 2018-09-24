@@ -60,14 +60,14 @@ class Registration extends Object
      * the function "__construct()" automatically starts whenever an object of this class is created,
      * you know, when you do "$login = new Login();"
      */
-    public function __construct()
+    public function __construct($params)
     {
         if (!isset($_SESSION)) {
             session_start();
         }
         // if we have such a POST request, call the registerNewUser() method
-        if (isset($_POST["register"])) {
-            $this->registerNewUser($_POST['user_name'], $_POST['user_email'], $_POST['user_password_new'], $_POST['user_password_repeat'], $_POST["captcha"]);
+        if (isset($params["register"])) {
+            $this->registerNewUser($params['user_name'], $params['user_email'], $params['user_password_new'], $params['user_password_repeat'], $params["captcha"]);
             // if we have such a GET request, call the verifyNewUser() method
         } else if (isset($_GET["id"]) && isset($_GET["verification_code"])) {
 
